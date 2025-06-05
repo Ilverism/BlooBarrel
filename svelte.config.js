@@ -1,21 +1,13 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-import remarkToc from 'remark-toc'
-import rehypeSlug from 'rehype-slug'
 
-/** @type {import('mdsvex').MdsvexOptions} */
-const mdsvexOptions = {
-	// ...
-	remarkPlugins: [[remarkToc, { tight: true }]],
-	rehypePlugins: [rehypeSlug]
-}
+const base = (process.env.NODE_ENV === 'production') ? '/BlooBarrel' : '';
 
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    // Consult https://svelte.dev/docs/kit/integrations
-    // for more information about preprocessors
+    
     preprocess: vitePreprocess(),
 
     extensions: ['.svelte'],
@@ -26,7 +18,7 @@ const config = {
             strict: false
         }),
         paths: {
-            base: "/BlooBarrel",
+            base: base
         }
     }
 

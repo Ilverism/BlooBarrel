@@ -3,6 +3,7 @@
     import { fade, fly, scale, slide } from 'svelte/transition';
     import { page } from '$app/state';
     import { Toggle } from "flowbite-svelte";
+    import { base } from '$app/paths';
     import type { Platform } from './Platform';
 
     let data:any = $state({
@@ -329,7 +330,9 @@
             console.log(`...Got owner and repo: '${owner}', '${repo}'...`);
 
             //Call the 'fetchReleases' function from the server with a POST request
-            const response = await fetch('/releases', {
+            const fetchTarget = `${base}/releases`;
+            console.log(`...Fetching releases from: ${fetchTarget}...`);
+            const response = await fetch(fetchTarget, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -399,10 +402,10 @@
         */
 
         //Get the base URL
-        console.log("Base URL:", page.url);
+        console.log("Base URL:", `${base}/${page.url}`);
 
         //Base HREF
-        const baseURLhref = page.url.href;
+        const baseURLhref = `${base}/${page.url.href}`;
 
         //Build the URL
         const shareableURL = new URL(baseURLhref);
@@ -429,10 +432,10 @@
         */
 
         //Get the base URL
-        console.log("Base URL:", page.url);
+        console.log("Base URL:", `${base}/${page.url}`);
 
         //Base HREF
-        const baseURLhref = page.url.href;
+        const baseURLhref = `${base}/${page.url.href}`;
         const shareableURL = new URL(baseURLhref);
 
         /*
