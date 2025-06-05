@@ -1,4 +1,3 @@
-+3-1
 import { env } from '$env/dynamic/private';
 const { GITHUB_TOKEN } = env;
 
