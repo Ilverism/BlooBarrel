@@ -1,0 +1,9 @@
+/* Tailwind */
+@import "tailwindcss";
+
+/* Flowbite */
+@plugin 'flowbite/plugin';
+@source "../node_modules/flowbite-svelte/dist";
+
+/* Tailwind Scrollbars */
+@plugin 'tailwind-scrollbar';
