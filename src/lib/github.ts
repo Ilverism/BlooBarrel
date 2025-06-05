@@ -1,4 +1,6 @@
-import { GITHUB_TOKEN } from '$env/static/private';
++3-1
+import { env } from '$env/dynamic/private';
+const { GITHUB_TOKEN } = env;
 
 const HEADERS = {
     Accept: 'application/vnd.github+json',
