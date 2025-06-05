@@ -1,7 +1,7 @@
 <script lang="ts">
     
     import PlatformButton from './PlatformButton.svelte';
-    import type { Platform } from './Platform';
+    import type { Platform } from './releases/Platform';
     
     let {
         latestRelease,
