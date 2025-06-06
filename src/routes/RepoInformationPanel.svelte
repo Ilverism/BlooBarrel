@@ -113,7 +113,21 @@
             <!-- Copy Repo URL -->
             <button
                 class="button-flat group {fetchedURL?'':'button-flat-disabled'}"
-                onclick={() => {/*...*/}}
+                onclick={() => {
+
+                    if (!fetchedURL)
+                        return;
+
+                    navigator.clipboard.writeText(fetchedURL)
+                        .then(() => {
+                            console.log("Fetched URL copied to clipboard!");
+                        })
+                        .catch((err) => {
+                            console.error("Failed to copy fetched URL to clipboard:", err);
+                        });
+
+
+                }}
                 aria-label="Copy URL"
             >
                 <i class="fa-fw fa-solid fa-copy"></i>

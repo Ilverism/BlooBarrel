@@ -283,7 +283,8 @@
     });
 
 
-    const RATE_LIMIT_WARNING = 10;
+    const RATE_LIMIT_WARNING = 5;
+    const REQUESTS_PER_FETCH =  4;
 
     let rateLimitMax = $state(0);
     let rateLimitRemaining = $state(0);
@@ -293,8 +294,8 @@
     let performedRateLimitFetch = $state(false);
     function extractRateInfo(res: Response) {
 
-        rateLimitMax =      +res.headers.get('x-ratelimit-limit')!;      
-        rateLimitRemaining =  +res.headers.get('x-ratelimit-remaining')!;
+        rateLimitMax        = +res.headers.get('x-ratelimit-limit')! / REQUESTS_PER_FETCH;
+        rateLimitRemaining  = +res.headers.get('x-ratelimit-remaining')! / REQUESTS_PER_FETCH;
         rateLimitResetEpoch = +res.headers.get('x-ratelimit-reset')!;    
 
         rateLimitResetTime = new Date(rateLimitResetEpoch * 1_000); //Convert to milliseconds
@@ -334,8 +335,8 @@
             return;
         }
 
-        rateLimitMax = coreRateLimit.limit;
-        rateLimitRemaining = coreRateLimit.remaining;
+        rateLimitMax = coreRateLimit.limit / REQUESTS_PER_FETCH;
+        rateLimitRemaining = coreRateLimit.remaining / REQUESTS_PER_FETCH;
         rateLimitResetEpoch = coreRateLimit.reset;
         rateLimitResetTime = new Date(rateLimitResetEpoch * 1_000); //Convert to milliseconds
         rateLimitResetTimeString = rateLimitResetTime.toLocaleString('en-US', {
@@ -426,6 +427,8 @@
             console.log("...Fetched repo metadata:", repoMeta);
             console.log("...Fetched readme:", readme);
             console.log("...Fetched topics:", topics);
+
+            fetchedURL = urlOverride ?? URL ?? null;
 
         }
 
@@ -558,7 +561,7 @@
                 <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
                 <div class="flex flex-col relative">
                     <span class="text-blue-400 self-center">BlooBarrel</span>
-                    <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. alpha-2025-06.01</span>
+                    <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.01</span>
                 </div>
             </div>
         
@@ -694,7 +697,7 @@
                 </div>
 
                 <!-- Search Input Area -->
-                <div class="justify-self-center flex flex-col gap-4 w-3xl mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%]">
+                <div class="justify-self-center flex flex-col gap-4 w-3xl mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%] my-2">
 
                     <!-- Search Bar Header -->
                     <div class="w-full">
