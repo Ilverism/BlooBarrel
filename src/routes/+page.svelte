@@ -38,7 +38,7 @@
     let repo = $state('');
 
     let repoMeta = $state(undefined);
-    let readme = $state(null);
+    let readme = $state<string | null>(null);
     let topics = $state<string[]>([]);
 
     type FileType = {
@@ -282,14 +282,73 @@
         return filteredAssets;
     });
 
-    let assetRecommended = $derived.by(() => {
-        return filteredAssets.find((asset: { isRecommended: any; }) => asset.isRecommended) ?? null;
-    });
+
+    const RATE_LIMIT_WARNING = 10;
+
+    let rateLimitMax = $state(0);
+    let rateLimitRemaining = $state(0);
+    let rateLimitResetEpoch = $state(0);
+    let rateLimitResetTime = $state(new Date(0));
+    let rateLimitResetTimeString = $state('??');
+    let performedRateLimitFetch = $state(false);
+    function extractRateInfo(res: Response) {
+
+        rateLimitMax =      +res.headers.get('x-ratelimit-limit')!;      
+        rateLimitRemaining =  +res.headers.get('x-ratelimit-remaining')!;
+        rateLimitResetEpoch = +res.headers.get('x-ratelimit-reset')!;    
+
+        rateLimitResetTime = new Date(rateLimitResetEpoch * 1_000); //Convert to milliseconds
+        rateLimitResetTimeString = rateLimitResetTime.toLocaleString('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'medium',
+            timeZone: 'UTC'
+        });
+
+        performedRateLimitFetch = true;
+
+    }
 
 
+    async function fetchRateInfo() {
 
+        /*
+            Similar to extractRateInfo, but fetches the rate limit info
+            from the GitHub API directly.
+        */
 
+        const headers = {
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+        };
 
+        const response = await fetch('https://api.github.com/rate_limit', { headers });
+        if (!response.ok) {
+            console.error("Failed to fetch rate limit info:", response.statusText);
+            return;
+        }
+
+        const rateLimitData = await response.json();
+        const coreRateLimit = rateLimitData.rate;
+        if (!coreRateLimit) {
+            console.error("No rate limit data found in response:", rateLimitData);
+            return;
+        }
+
+        rateLimitMax = coreRateLimit.limit;
+        rateLimitRemaining = coreRateLimit.remaining;
+        rateLimitResetEpoch = coreRateLimit.reset;
+        rateLimitResetTime = new Date(rateLimitResetEpoch * 1_000); //Convert to milliseconds
+        rateLimitResetTimeString = rateLimitResetTime.toLocaleString('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'medium',
+            timeZone: 'UTC'
+        });
+
+        performedRateLimitFetch = true;
+
+    }
+
+    fetchRateInfo();
 
 
     let isFetching = $state(false);
@@ -329,51 +388,44 @@
 
             console.log(`...Got owner and repo: '${owner}', '${repo}'...`);
 
-            //Call the 'fetchReleases' function from the server with a POST request
-            const fetchTarget = `${base}/releases`;
-            console.log(`...Fetching releases from: ${fetchTarget}...`);
-            const response = await fetch(fetchTarget, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    owner: owner,
-                    repo: repo,
-                })
-            });
+            const apiRoot = `https://api.github.com/repos/${owner}/${repo}`;
+            const headers = {
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            };
 
-            //Check if the response is ok
-            if (!response.ok) {
-                console.error("...Failed to fetch releases!");
-                return;
-            }
-            
-            //Log the response
-            const dataIncoming = await response.json();
-            console.log("...Fetched releases:", dataIncoming);
+            const releasesRes  = fetch(`${apiRoot}/releases?per_page=1`, { headers });
+            const repoRes      = fetch(apiRoot, { headers });
+            const readmeRes    = fetch(`${apiRoot}/readme`, {headers: { ...headers, Accept: 'application/vnd.github.raw' }});
+            const topicsRes    = fetch(`${apiRoot}/topics`,          { headers });
 
-            //Check if the response is empty
-            if (dataIncoming.length == 0) {
-                console.error("...No releases found!");
-                return;
-            }
 
-            //Update Repo Metadata
-            repoMeta = {...dataIncoming.repoMeta};
+            // kick them all off in parallel
+            const [relResp, repoResp, readmeResp, topicsResp] = await Promise.all([
+                releasesRes, repoRes, readmeRes, topicsRes
+            ]);
 
-            //Update Readme
-            readme = dataIncoming.readme ?? null;
 
-            //Update Topics
-            topics = dataIncoming.topics ?? [];
+            const rateInfo = extractRateInfo(relResp);
+            console.log('Rate-limit: ', rateInfo);
 
-            //Set the data to the releases
-            data.releases = [...dataIncoming.releases];
-            data.fromCache = false;
+            // hydrate the same reactive stores you already have
+            const [_releases, _repoMeta, _readmeText, _topicsJson] = await Promise.all([
+                relResp.json(),
+                repoResp.json(),
+                readmeResp.ok ? readmeResp.text() : null,
+                topicsResp.json()
+            ]);
 
-            //Set the fetched URL
-            fetchedURL = URL ?? null;
+            data.releases = _releases;
+            repoMeta      = _repoMeta;
+            readme        = _readmeText;
+            topics        = _topicsJson?.names ?? [];
+
+            console.log("...Fetched releases:", data.releases);
+            console.log("...Fetched repo metadata:", repoMeta);
+            console.log("...Fetched readme:", readme);
+            console.log("...Fetched topics:", topics);
 
         }
 
@@ -488,8 +540,6 @@
         console.log("Page mounted, attempting to load shareable URL...");
         loadShareableURL();
     });
-
-
 
 </script>
 
@@ -687,6 +737,22 @@
                         </div>
 
                     </div>
+
+                    <!-- Rate Limit Indicator -->
+                    {#if performedRateLimitFetch && (rateLimitRemaining < RATE_LIMIT_WARNING)}
+                        <div class="warning-text text-sm! mb-2">
+                            <i class="fa-fw fa-solid fa-triangle-exclamation mr-2"></i>
+                            <span>
+                                Low rate limit: {rateLimitRemaining}/{rateLimitMax} remaining. Resets at {rateLimitResetTimeString}.
+                            </span>
+                        </div>
+                        <!-- <a aria-label="Authenticate GitHub" class="button-flat group text-red-800! text-sm! s-y_bCXRrkrYfP" href={PUBLIC_GH_OAUTH_WORKER}>
+                            <i class="fa-fw fa-brands fa-github s-y_bCXRrkrYfP"></i>
+                            <div class="group-hover:underline s-y_bCXRrkrYfP">
+                                Authenticate with GitHub to increase your rate limit.
+                            </div>
+                        </a> -->
+                    {/if}
 
                 </div>
 

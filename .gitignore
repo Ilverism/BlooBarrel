@@ -21,3 +21,9 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+
+# GitHub Auth Stuff (WIP)
+wrangler.toml
+github-auth.ts
+github-oauth-login.ts
