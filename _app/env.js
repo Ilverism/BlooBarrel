@@ -1,1 +1,1 @@
-export const env={}
+export const env={"PUBLIC_GH_OAUTH_WORKER":"https://bloobarrel-worker.ilverism.workers.dev/"}
