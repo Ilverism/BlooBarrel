@@ -1,5 +1,7 @@
 <script>
 
+    import { formatLowPrec } from "$lib/format";
+
     let {
         asset,
         isRecommended=false,
@@ -37,6 +39,10 @@
         else
             return `${(sizeInMB / 1024).toFixed(2)} GB`;
 
+    });
+
+    const downloadCountFormatted = $derived.by(() => {
+        return asset?.download_count ? formatLowPrec(asset.download_count) : '??';
     });
 
     const assetSizeClass = $derived.by(() => {
@@ -149,6 +155,15 @@
                     {asset?.platform.name}
                 </div>
 
+                <!-- Download Count -->
+                <div class="flex flex-row items-center gap-2">
+                    <div class="text-right
+                        justify-self-end {assetSizeClass}">
+                        {downloadCountFormatted}
+                    </div>
+                    <i class="fa-solid fa-fw fa-download text-blue-400"></i>
+                </div>
+
             </div>
 
             <!-- Bottom Row -->
@@ -188,20 +203,32 @@
             <!-- <i class="pl-6 {asset?.platform.icon}"></i> -->
 
             <!-- Asset Name -->
-            <div class="p-1">
+            <div class="p-1 flex shrink-[9999] pr-8">
                 <div class="platform-asset-name line-clamp-1! text-sm!">
                     {assetNameFormatted}
                 </div>
             </div>
 
             <!-- Download Size -->
-            <div class="ml-auto min-w-fit text-right justify-self-end {assetSizeClass}">
-                {assetSizeFormatted}
-            </div>
+            <div class="flex flex-row items-center gap-2 justify-end grow-[9999]">
 
-            <!-- File Extension -->
-            <div class="ml-4 w-8 justify-self-end text-right {extensionClass} text-sm!">
-                {asset?.extension}
+                <div class="min-w-fit text-right justify-self-end {assetSizeClass}">
+                    {assetSizeFormatted}
+                </div>
+
+                <!-- Download Count -->
+                <div class="w-16 ml-2 text-right justify-self-end flex flex-row gap-1 justify-end items-center text-sm">
+                    <div class="ml-auto">
+                        {downloadCountFormatted}
+                    </div>
+                    <i class="fa-solid fa-fw fa-download text-blue-400 text-md"></i>
+                </div>
+
+                <!-- File Extension -->
+                <div class="ml-2 w-8 justify-self-end text-right {extensionClass} text-sm!">
+                    {asset?.extension}
+                </div>
+
             </div>
 
         </button>
