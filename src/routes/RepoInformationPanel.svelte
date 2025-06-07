@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { formatLowPrec } from '$lib/format';
+
     import showdown from 'showdown';
     const markdownConverter = new showdown.Converter({
         tables: true,
@@ -175,8 +177,9 @@
         {@const readmeHTML = markdownConverter.makeHtml(readme)}
 
         <div class="
-            bg-blue-200 p-4 w-full h-full top-0 left-0 overflow-y-scroll overflow-x-clip rounded-lg text-slate-700
-            scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100
+            p-4 w-full h-full top-0 left-0 overflow-y-scroll overflow-x-clip rounded-lg text-slate-700
+            assets-scrollbar
+            markdown-body
         ">
             {@html readmeHTML}
         </div>
@@ -223,11 +226,11 @@
                 class="group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg "
                 onclick={openReadme}
             >
-                <div class="pointer-events-none mask-b-from-20% bg-blue-200 p-4 w-full h-full top-0 left-0 text-slate-700 rounded-lg">
+                <div class="pointer-events-none mask-b-from-20% markdown-body p-4 w-full h-full top-0 left-0 text-slate-700 rounded-lg">
                     {@html readmeHTML}
                 </div>
                 <!-- <div class="w-full h-full from-white/0   absolute left-0 top-0"></div> -->
-                <div class="absolute scale-200 bottom-4 right-4 text-slate-700 bg-transparent opacity-0 group-hover:opacity-100 group-hover:scale-225 z-10 transition-all duration-200 ease-out">
+                <div class="absolute scale-200 bottom-4 right-4 expand-icon bg-transparent opacity-0 group-hover:opacity-100 group-hover:scale-225 z-10 transition-all duration-200 ease-out">
                     <i class="fa fa-expand fa-fw"></i>
                 </div>
             </button>
@@ -239,26 +242,26 @@
 
 
         <!-- Data Points -->
-        <div class="flex flex-row items-center justify-between min-w-full h-fit">
+        <div class="flex flex-row items-center justify-between min-w-full h-fit message-text">
 
             <div class="flex flex-row items-center justify-end gap-2">
                 <i class="fa fa-code-fork"></i>
                 <div>
-                    <b>{repo.forks_count ?? "( ? )"}</b> Forks
+                    <b>{formatLowPrec(repo.forks_count) ?? "( ? )"}</b> Forks
                 </div>
             </div>
 
             <div class="flex flex-row items-center justify-end gap-2">
                 <i class="fa fa-eye"></i>
                 <div>
-                    <b>{repo.watchers_count ?? "( ? )"}</b> Watchers
+                    <b>{formatLowPrec(repo.watchers_count) ?? "( ? )"}</b> Watchers
                 </div>
             </div>
 
             <div class="flex flex-row items-center justify-end gap-2">
                 <i class="fa fa-star"></i>
                 <div>
-                    <b>{repo.stargazers_count ?? "( ? )"}</b> Stars
+                    <b>{formatLowPrec(repo.stargazers_count) ?? "( ? )"}</b> Stars
                 </div>
             </div>
 
@@ -275,7 +278,15 @@
 <style lang="postcss">
 
     @reference "tailwindcss";
+    @custom-variant dark (&:where(.dark, .dark *));
+    @plugin 'tailwind-scrollbar';
+
     
+    :global(.expand-icon) {
+        @apply text-slate-700;
+        @apply dark:text-slate-100;
+    }
+
     :global(.information-panel) {
         /* @apply h-full min-h-0; */
         @apply min-h-0 h-full;
@@ -283,6 +294,7 @@
         @apply py-2;
         @apply px-4;
         @apply bg-blue-50;
+        @apply dark:bg-slate-700;
         @apply text-slate-500;
         @apply rounded-lg;
         @apply outline-3 outline-offset-4 outline-solid outline-blue-300;
@@ -307,11 +319,15 @@
         @apply lg:text-xl;
         @apply font-bold;
         @apply border-b border-slate-400/10 mb-2;
+        @apply text-slate-500;
+        @apply dark:text-slate-200;
     } 
 
     :global(.topic-badge) {
         @apply bg-blue-100;
         @apply text-slate-700;
+        @apply dark:bg-slate-600;
+        @apply dark:text-slate-200;
         @apply px-2 py-1;
         @apply rounded-full;
         @apply text-sm;
@@ -333,14 +349,18 @@
 
     :global(.info-panel-description) {
         @apply lg:text-sm;
+        @apply text-slate-500;
+        @apply dark:text-slate-200;
     }
 
 
     /* MARKDOWN FORMATTING */
-    /* :global(p) {
-        @apply flex flex-row items-start justify-start;
-        @apply gap-2;
-    } */
+    :global(.markdown-body) {
+        @apply bg-blue-200;
+        /* @apply dark:bg-blue-200/80; */
+        @apply dark:bg-slate-800;
+        @apply dark:text-slate-200;
+    }
     :global(a) {
         @apply text-blue-500;
         @apply hover:underline;
@@ -348,6 +368,7 @@
     
     :global(pre) {
         @apply bg-blue-100;
+        @apply dark:bg-slate-700;
         @apply p-2;
         @apply m-2;
         @apply break-all!;
@@ -357,6 +378,7 @@
     :global(code) {
         @apply break-all!;
         @apply bg-blue-100;
+        @apply dark:bg-slate-700;
         @apply rounded-sm;
         @apply px-1;
     }
@@ -385,6 +407,7 @@
         @apply my-6;
         @apply px-4;
         @apply bg-blue-300;
+        @apply dark:bg-blue-400;
         @apply rounded-lg;
         @apply overflow-hidden;
     }
@@ -404,6 +427,7 @@
         @apply pl-4;
         /* @apply even:bg-blue-300; */
         @apply even:bg-[color:color-mix(in_srgb,var(--color-blue-200)_50%,var(--color-blue-300)_50%)];
+        @apply dark:even:bg-[color:color-mix(in_srgb,var(--color-blue-300)_50%,var(--color-blue-400)_50%)];
         /* @apply even:bg-[color:--bg-col-even]; */
     }
 

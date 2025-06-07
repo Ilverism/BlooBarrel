@@ -179,7 +179,7 @@
             class="
                 cursor-pointer relative flex flex-row bg-zinc-50 w-full rounded-lg items-center pr-4
                 outline-2 outline-offset-2 outline-solid outline-blue-300
-                hover:scale-101 transition-all duration-100 ease-out
+                platform-button
                 "
             aria-label="Download Release"
         >
@@ -213,6 +213,7 @@
 <style lang="postcss">
 
     @reference "tailwindcss";
+    @custom-variant dark (&:where(.dark, .dark *));
 
 
     /* Platform Button -- Empty */
@@ -232,10 +233,12 @@
     .platform-button {
         @apply w-full;
         @apply h-full;
-        @apply bg-zinc-50;
+        @apply bg-white;
+        @apply dark:bg-slate-900;
         @apply rounded-sm;
-        @apply scale-100 hover:scale-105;
+        @apply scale-100 hover:scale-103;
         @apply outline-2 outline-offset-2 outline-solid outline-blue-300;
+        @apply dark:outline-blue-500;
 
         @apply transition-all duration-100 ease-out;
     }
@@ -243,6 +246,7 @@
     .platform-name {
         @apply text-lg;
         @apply text-blue-400;
+        @apply dark:text-blue-200;
     }
 
     .platform-icon {
@@ -265,35 +269,45 @@
     /* Platform Button -- Top Recommended */
     .platform-button-top-recommended {
         @apply bg-white;
+        @apply dark:bg-slate-900;
         @apply outline-blue-600;
+        @apply dark:outline-blue-200;
         @apply rounded-xl;
         @apply shadow-lg;
         @apply shadow-black/50;
+        @apply dark:shadow-zinc-50/33;
     }
 
     .platform-name-top-recommended {
         @apply text-xl;
         @apply text-blue-600;
+        @apply dark:text-blue-400;
     }
 
     .platform-icon-top-recommended {
         @apply text-8xl;
         @apply text-blue-700;    /* <-- Darker than the button (should be the first thing anyone sees) */
+        @apply dark:text-blue-500;
     }
 
     .platform-extension-top-recommended {
         @apply text-2xl;
         @apply text-blue-600;
+        @apply dark:text-blue-400;
     }
 
     /* Platform Button -- Recommended */
     .platform-button-recommended { 
         @apply outline-blue-600;
         @apply text-blue-700;
+
+        @apply dark:text-blue-400;
+        @apply dark:outline-blue-500;
     }
 
     .platform-name-recommended {
         @apply text-blue-600;
+        @apply dark:text-blue-400;
     }
 
     .platform-icon-recommended {

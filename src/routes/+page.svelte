@@ -347,9 +347,27 @@
 
         performedRateLimitFetch = true;
 
+        console.log("Rate limit info fetched:", {
+            rateLimitMax,
+            rateLimitRemaining,
+            rateLimitResetEpoch,
+            rateLimitResetTime,
+            rateLimitResetTimeString
+        });
+
     }
 
-    fetchRateInfo();
+    onMount(() => {
+
+        /*
+            Fetch the rate limit info on page load.
+            This will be used to display the rate limit status.
+        */
+
+        console.log("Page mounted, fetching rate limit info...");
+        fetchRateInfo();
+
+    });
 
 
     let isFetching = $state(false);
@@ -544,6 +562,19 @@
         loadShareableURL();
     });
 
+    //Theme Toggle
+    let darkTheme = $state(false);
+    $effect(() => {
+
+        if (darkTheme) {
+            document.documentElement.classList.add('dark');
+            console.log("Dark theme enabled.");
+        } else {
+            document.documentElement.classList.remove('dark');
+            console.log("Dark theme disabled.");
+        }
+    });
+
 </script>
 
 
@@ -551,7 +582,7 @@
 <div class="flex flex-col min-h-screen">
 
     <!-- Sticky Page Header -->
-    <div class="top-0 z-10 bg-base-100 bg-blue-200" id="page-header">
+    <div class="top-0 z-10 bg-base-100 header-area" id="page-header">
 
         <!-- Header -->
         <div class="flex flex-row items-center justify-between py-4 px-8 shadow-md z-20 relative">
@@ -595,13 +626,35 @@
                         <!-- What the user actually sees -->
                         <label class="flex items-center gap-2 pointer-events-none select-none w-full" for="platform-select">
                             <i class="{userPlatformFull?.icon} text-blue-600"></i>
-                            <span class="text-sm font-bold text-slate-700 w-full flex flex-row items-center gap-2">
+                            <span class="text-sm font-bold message-text w-full flex flex-row items-center gap-2">
                                 {userPlatformFull?.name ?? 'Unknown'}
                                 <i class="fa-solid fa-chevron-down text-slate-400 opacity-50 group-hover:opacity-100 ml-auto"></i>
                             </span>
                         </label>
                     </div>
 
+                </div>
+
+                <!-- Theme Toggle -->
+                <div class="flex flex-col min-w-48">
+
+                    <div class="header-flat">
+                        Toggle Theme
+                    </div>
+
+                    <!-- Toggle Switch -->
+                    <div class="flex flex-row">
+                        <Toggle
+                            bind:checked={darkTheme}
+                            color="blue"
+                            class="py-1 hover:cursor-pointer"
+                            aria-label="Toggle Page Theme"
+                        >
+                        </Toggle>
+
+
+                        <i class="fa-solid fa-fw {darkTheme?'fa-moon':'fa-sun'} message-text py-1 scale-125 self-center"></i>
+                    </div>
                 </div>
 
                 <!-- Information Panel Toggle -->
@@ -635,7 +688,7 @@
 
     <!-- Search Area -->
     <!-- <div class="flex flex-col items-center justify-center bg-blue-100 gap-4 relative lg:px-24 "> -->
-    <div class="flex flex-col items-center justify-center bg-blue-100 gap-4 relative lg:px-24">
+    <div class="search-area flex flex-col items-center justify-center gap-4 relative lg:px-24">
 
 
         <!-- Search Panel -->
@@ -671,7 +724,7 @@
                     <!-- Instructions Content -->
                     {#if displayInstructions}
                         <span out:fade={{ duration: 200 }} in:fade={{ duration: 200 }}>
-                            <ul class="list-disc list-inside text-sm text-slate-500 max-w-112 space-y-4"
+                            <ul class="list-disc list-inside text-sm instructions-text max-w-112 space-y-4"
                                 in:slide={{ duration: 400 }}   
                                 out:slide={{ duration: 400 }}
                             >
@@ -729,7 +782,7 @@
                             {:else}
                                 <button
                                     disabled={!searchPanelText}
-                                    class="group flex items-center min-w-16 min-h-16 justify-center bg-white rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none"
+                                    class="group disabled:opacity-50 flex items-center min-w-16 min-h-16 justify-center button-standard rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none"
                                     onclick={() => fetchFromURL()}
                                     aria-label="Fetch Releases"
                                 >
@@ -785,7 +838,7 @@
             class="
                 group absolute left-1/2 bottom-0            /* anchor: bottom-centre of header */
                 -translate-x-1/2  translate-y-1/2           /* shove left 50 %, down 50 %   */
-                w-16 h-16 rounded-full bg-white/100 shadow-lg
+                w-16 h-16 rounded-full button-standard shadow-lg
                 border border-slate-400/50 border-t-0
                 hover:scale-115 hover:bg-slate-100 hover:cursor-pointer
                 z-50
@@ -878,7 +931,7 @@
                     
                 <i class="fa-solid fa-chevron-down text-9xl text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"></i>
 
-                <div class="text-3xl italic text-slate-400 font-light whitespace-pre flex flex-col items-center justify-center gap-4">
+                <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
                     <div>
                         Welcome to BlooBarrel.
                     </div>
@@ -891,13 +944,13 @@
                 <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
 
                 <!-- Copyable Example -->
-                <button class="hover:cursor-pointer mt-24 text-2xl italic text-slate-400 font-light whitespace-pre flex flex-col items-center justify-center gap-4"
+                <button class="group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4"
                                 onclick={() => {
                             navigator.clipboard.writeText('https://github.com/electron/electron/');
                             console.log("Copied example URL to clipboard!");
                         }}>
                     Try an example (click to copy, then paste into the search bar):
-                    <span class="button-flat group">
+                    <span class="button-flat">
                         <i class="fa-fw fa-solid fa-link"></i>
                         <div class="group-hover:underline">
                             https://github.com/electron/electron/
@@ -919,18 +972,27 @@
 <style lang="postcss">
 
     @reference "tailwindcss";
+    @custom-variant dark (&:where(.dark, .dark *));
 
     .search-bar {
         
         @apply min-w-[50%];
         @apply min-h-12;
         @apply bg-white;
-        @apply text-blue-300;
+        @apply text-blue-400;
+        @apply dark:bg-slate-900;
+        @apply dark:text-blue-200;
         @apply rounded-sm;
         @apply outline-3 outline-offset-2 outline-solid outline-blue-300;
         
     }
 
+
+    :global(.message-text) {
+        @apply text-slate-500;
+        @apply dark:text-slate-200;
+
+    }
 
     :global(html, body) {
         @apply overflow-x-hidden;
@@ -940,12 +1002,16 @@
 
     :global(body){
         @apply overflow-y-scroll;
-        @apply bg-zinc-50;
+        @apply bg-gradient-to-r;
+        @apply from-white via-40% via-white to-zinc-100;
+        @apply dark:from-zinc-900 via-40% dark:via-zinc-900 dark:to-neutral-900;
         @apply m-0 flex flex-col min-h-screen;
     }
 
     :global(.header-flat) {
         @apply text-2xl text-slate-500 font-light inline-block border-b border-slate-400/25 pb-0.5 mb-1;
+        @apply dark:text-slate-200;
+        @apply dark:border-slate-100/25;
     }
 
     :global(.header-large) {
@@ -953,8 +1019,11 @@
     }
 
     :global(.header-large-flat) {
-        @apply text-7xl text-neutral-700 font-normal;
+        @apply text-7xl font-normal;
+        @apply text-neutral-700;
+        @apply dark:text-neutral-100;
         @apply inline-block border-b border-slate-400/50 pb-1.75 mb-1.75;
+        @apply dark:border-slate-200/50;
     }
 
     .header-sub {
@@ -963,8 +1032,10 @@
 
     :global(.button-flat) {
         @apply text-neutral-700;
+        @apply dark:text-neutral-100;
         @apply flex flex-row gap-2 items-center justify-center;
         @apply hover:cursor-pointer;
+        @apply italic;
     }
 
     :global(.button-flat-disabled) {
@@ -972,14 +1043,34 @@
         @apply pointer-events-none;
         @apply cursor-not-allowed;
         @apply select-none;
-        @apply italic;
     }
 
     :global(.warning-text) {
         @apply text-red-800;
+        @apply dark:text-red-400;
         @apply font-bold;
         @apply text-2xl;
         @apply italic;
+    }
+
+    :global(.search-area) {
+        @apply bg-blue-100;
+        @apply dark:bg-slate-700;
+    }
+
+    :global(.header-area) {
+        @apply bg-blue-200;
+        @apply dark:bg-slate-800;
+    }
+
+    :global(.instructions-text) {
+        @apply text-slate-500;
+        @apply dark:text-slate-200;
+    }
+
+    :global(.button-standard) {
+        @apply bg-white;
+        @apply dark:bg-slate-900;
     }
 
 </style>

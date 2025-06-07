@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { formatLowPrec } from '$lib/format';   
+
     import showdown from 'showdown';
     const markdownConverter = new showdown.Converter({
         tables: true,
@@ -144,8 +146,7 @@
         {@const readmeHTML = markdownConverter.makeHtml(body)}
 
         <div class="
-            bg-blue-200 p-4 w-full h-full top-0 left-0 overflow-y-scroll overflow-x-clip rounded-lg text-slate-700
-            scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100
+            markdown-body p-4 w-full h-full top-0 left-0 overflow-y-scroll overflow-x-clip rounded-lg
         ">
             {@html readmeHTML}
         </div>
@@ -201,11 +202,11 @@
                 class="group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg"
                 onclick={openNotes}
             >
-                <div class="pointer-events-none mask-b-from-20% bg-blue-200 p-4 w-full h-full top-0 left-0 text-slate-700 rounded-lg">
+                <div class="pointer-events-none mask-b-from-20% markdown-body p-4 w-full h-full top-0 left-0 rounded-lg">
                     {@html readmeHTML}
                 </div>
                 <!-- <div class="w-full h-full from-white/0   absolute left-0 top-0"></div> -->
-                <div class="absolute scale-200 bottom-4 right-4 text-slate-700 bg-transparent opacity-0 group-hover:opacity-100 group-hover:scale-225 z-10 transition-all duration-200 ease-out">
+                <div class="absolute scale-200 bottom-4 right-4 expand-icon bg-transparent opacity-0 group-hover:opacity-100 group-hover:scale-225 z-10 transition-all duration-200 ease-out">
                     <i class="fa fa-expand fa-fw"></i>
                 </div>
             </button>
@@ -217,13 +218,13 @@
 
 
         <!-- Data Points -->
-        <div class="flex flex-row items-center justify-between min-w-full h-fit">
+        <div class="flex flex-row items-center justify-between min-w-full h-fit message-text">
 
             <!-- Asset Count -->
             <div class="flex flex-row items-center justify-end gap-2">
                 <i class="fa fa-cubes"></i>
                 <div>
-                    <b>{assetCount ?? "( ? )"}</b> Assets
+                    <b>{formatLowPrec(assetCount) ?? "( ? )"}</b> Assets
                 </div>
             </div>
 

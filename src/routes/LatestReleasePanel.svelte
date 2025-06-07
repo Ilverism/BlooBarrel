@@ -43,7 +43,7 @@
 
     });
 
-    let viewAsList = $state(false);
+    let viewAsList = $state(true);
 
     /*
         Assets Per Platform
@@ -184,11 +184,11 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 Warning
             </div>
-            <div class="text-3xl italic text-slate-400 font-light whitespace-pre">
+            <div class="text-3xl italic message-text font-light whitespace-pre">
                 {subtitleMessage}
             </div>
         {:else}
-            <div class="text-3xl italic text-slate-400 font-light mt-4 whitespace-pre">
+            <div class="text-3xl italic message-text font-light whitespace-pre mt-4">
                 {subtitleMessage}
             </div>
         {/if}
@@ -199,13 +199,13 @@
     {#if assetsByPlatform.length}
 
         <!-- <div class="relative mt-12 flex flex-row items-center justify-start gap-4 w-full h-full grow bg-blue-50"> -->
-        <div class="relative mt-12 flex flex-row items-center justify-start gap-4 w-full h-full bg-blue-50">
+        <div class="relative mt-12 flex flex-row items-center justify-start gap-4 w-full h-full latest-release-panel-bg">
 
             <!-- Release Information Area -->
             <div class="absolute left-0 top-0 flex flex-row items-start justify-center ml-8 mt-4 gap-4 w-full">
 
                 <!-- Key -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 text-slate-500">
+                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text">
 
                     <div class="header-flat w-full">
                         Key
@@ -213,20 +213,20 @@
 
                     <!-- Light Blue Circle -->
                     <div class="flex flex-row items-center gap-2 w-full">
-                        <div class="w-2 h-2 aspect-square rounded-full bg-blue-300"></div>
+                        <div class="w-2 h-2 aspect-square rounded-full downloadable-asset"></div>
                         <div class="text-sm">Downloadable Assets</div>
                     </div>
 
                     <!-- Dark Blue Circle -->
                     <div class="flex flex-row items-center gap-2">
-                        <div class="w-2 h-2 aspect-square rounded-full bg-blue-600"></div>
+                        <div class="w-2 h-2 aspect-square rounded-full recommended-asset"></div>
                         <div class="text-sm">Recommended Downloads</div>
                     </div>
 
                 </div>
 
                 <!-- Release Info -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 text-slate-500">
+                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text">
 
                     <div class="header-flat flex! flex-row! items-center gap-4">
                         <div class="whitespace-nowrap">
@@ -277,14 +277,14 @@
 
                 <div class="recommended-asset-container max-w-[20%] min-w-[20%] max-h-[5%] aspect-square mt-16">
 
-                    <div class="header-flat flex! flex-row! items-center gap-4 h-full">
+                    <div class="header-flat flex! flex-row! items-center gap-4 ml-12 h-full">
                         <i class="fa-solid fa-cloud-arrow-down opacity-50"></i>
                         <div class="font-bold whitespace-nowrap text-xl">
                             Top Recommended Download
                         </div>
                     </div>
 
-                    <div class="w-96 min-h-64 mt-4">
+                    <div class="w-96 min-h-64 mt-4 ml-4 self-center">
                         <PlatformButton asset={assetRecommended} isRecommended isTopRecommended/>
                     </div>
                 </div>
@@ -303,11 +303,11 @@
                     <div class="
                         grid [grid-template-columns:repeat(auto-fit,_minmax(16rem,_1fr))]
                         gap-x-4 gap-y-6 w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8
-                        scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100
+                        assets-scrollbar
                         "
                     >
 
-                        {#each assetsByPlatform as asset}
+                        <!-- {#each assetsByPlatform as asset}
                             
                             <div class="w-64 h-48 mx-auto">
                                 <PlatformButton asset={asset} isRecommended={asset.isRecommended}/>
@@ -316,6 +316,18 @@
                             <div class="text-slate-500 text-lg italic">
                                 No assets available for this platform.
                             </div>
+                        {/each} -->
+
+                        {#each assetsPerPlatform as assetGroup}
+
+                            {#each assetGroup.assets as asset}
+
+                                <div class="w-64 h-48 mx-auto">
+                                    <PlatformButton asset={asset} isRecommended={assetGroup.isRecommended}/>
+                                </div>
+
+                            {/each}
+
                         {/each}
 
                     </div>
@@ -325,7 +337,7 @@
                 
                     <!-- Platform Scroll Buttons -->
                     {#if assetPlatforms.length > 1}
-                        <div class="absolute flex flex-col gap-4 left-[0] -ml-10 top-1/2 -translate-y-1/2 w-fit h-fit">
+                        <div class="absolute flex flex-col gap-4 left-[0] -ml-12 top-1/2 -translate-y-1/2 w-fit h-fit">
                             {#each assetPlatforms as platform}
                                 <button
                                     class="button-flat group text-lg ml-16 flex flex-row items-center"
@@ -338,8 +350,10 @@
                     {/if}
 
                     <!-- Assets Per Platform List -->
-                    <div
-                        class="w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100"
+                    <div class="
+                        w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8 flex flex-col gap-4
+                        assets-scrollbar
+                        "
                         bind:this={listEl}
                     >
 
@@ -385,6 +399,18 @@
 <style lang="postcss">
 
     @reference "tailwindcss";
+    @custom-variant dark (&:where(.dark, .dark *));
+    @plugin 'tailwind-scrollbar';
+
+    
+    .downloadable-asset {
+        @apply bg-blue-300;
+        @apply dark:bg-blue-500;
+    }
+    .recommended-asset {
+        @apply bg-blue-600;
+        @apply dark:bg-blue-200;
+    }
 
     .recommended-asset-container {
         @apply flex flex-col;
@@ -396,10 +422,15 @@
         @apply flex flex-col items-center justify-center mx-24;
     }
 
-    ::-webkit-scrollbar-track {
-        background: rgb(244, 22, 22);
+    .latest-release-panel-bg {
+        @apply bg-blue-50;
+        @apply dark:bg-slate-700;
     }
-
-
+    
+    :global(.assets-scrollbar) {
+        @apply scrollbar-thin;
+        @apply scrollbar-thumb-blue-300 scrollbar-track-blue-100;
+        @apply dark:scrollbar-thumb-blue-500 dark:scrollbar-track-slate-900;
+    }
 
 </style>
