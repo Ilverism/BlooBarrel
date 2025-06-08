@@ -263,11 +263,13 @@
         @apply bg-white;
         @apply dark:bg-slate-900;
         @apply rounded-sm;
-        @apply scale-100 hover:scale-103;
+        @apply scale-100 hover:scale-101;
         @apply outline-2 outline-offset-2 outline-solid outline-blue-300;
         @apply dark:outline-blue-500;
 
         @apply transition-all duration-100 ease-out;
+
+        @apply overflow-clip;
     }
 
     .platform-name {
