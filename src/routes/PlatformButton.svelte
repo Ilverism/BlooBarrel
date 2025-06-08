@@ -8,15 +8,7 @@
         isTopRecommended=false,
         listMode=false,
     } = $props();
-
-    let isEmptyAsset = $derived.by(() => {
-        return !asset || !asset.browser_download_url || !asset.platform// || !asset.extension;
-    });
-
-    $effect(() => {
-        console.log("Platform Button: ", asset, isRecommended, isEmptyAsset);
-    });
-
+    
 
     const browserDownloadURL = $derived.by(() => {
         return asset?.browser_download_url || '';
@@ -47,14 +39,22 @@
 
     const assetSizeClass = $derived.by(() => {
 
+        let fontWeightClass = 'font-normal';
+
         //Larger size --> Greater font weight
         if (assetSizeFormatted.includes('GB'))
-            return 'font-bold';
+            fontWeightClass = 'font-bold';
 
         if (assetSizeFormatted.includes('MB'))
-            return 'font-semibold';
+            fontWeightClass = 'font-semibold';
 
-        return 'font-normal';
+        let sizeClass = 'platform-download-size';
+        if (isTopRecommended)
+            sizeClass += ' platform-download-size-top-recommended';
+        else if (isRecommended)
+            sizeClass += ' platform-download-size-recommended';
+
+        return `${sizeClass} ${fontWeightClass}`;
 
     });
 
@@ -68,11 +68,6 @@
 
         return nameOut;
 
-    });
-
-
-    const containerClass = $derived.by(() => {
-        return isEmptyAsset ? 'platform-button-container-empty' : 'platform-button-container';
     });
 
     const buttonClass = $derived.by(() => {
@@ -90,17 +85,20 @@
 
     });
 
-    // const iconClass = $derived.by(() => {
+    const downloadCountClass = $derived.by(() => {
 
-    //     if (isTopRecommended)
-    //         return 'platform-icon platform-icon-top-recommended';
+        //Top Recommended
+        if (isTopRecommended)
+            return 'platform-download-count platform-download-count-top-recommended';
 
-    //     if (isRecommended)
-    //         return 'platform-icon platform-icon-recommended';
+        //Recommended
+        if (isRecommended)
+            return 'platform-download-count platform-download-count-recommended';
 
-    //     return 'platform-icon';
+        //Standard
+        return 'platform-download-count';
 
-    // });
+    });
 
     const nameClass = $derived.by(() => {
 
@@ -135,13 +133,13 @@
         download
         target="_blank"
         rel="noopener"
-        class="m-4 platform-button-container min-w-full min-h-full {containerClass}"
+        class="m-4 platform-button-container min-w-full min-h-full"
     >
         <button class="cursor-pointer relative {buttonClass}" aria-label="Download Release">
             
             <!-- Asset Name -->
-            <div class="p-4">
-                <div class="platform-asset-name">
+            <div class="px-6 py-8">
+                <div class="platform-asset-name {nameClass} text-2xl! text-shadow-[0_0_8px_var(--color-blue-400)] px-2">
                     {assetNameFormatted}
                 </div>
             </div>
@@ -156,12 +154,11 @@
                 </div>
 
                 <!-- Download Count -->
-                <div class="flex flex-row items-center gap-2">
-                    <div class="text-right
-                        justify-self-end {assetSizeClass}">
+                <div class="flex flex-row items-center gap-2 {downloadCountClass}">
+                    <div class="text-rightjustify-self-end">
                         {downloadCountFormatted}
                     </div>
-                    <i class="fa-solid fa-fw fa-download text-blue-400"></i>
+                    <i class="fa-solid fa-fw fa-download"></i>
                 </div>
 
             </div>
@@ -192,20 +189,15 @@
     >
         <button
             class="
-                cursor-pointer relative flex flex-row bg-zinc-50 w-full rounded-lg items-center pr-4
-                outline-2 outline-offset-2 outline-solid outline-blue-300
-                platform-button
+                cursor-pointer relative flex flex-row w-full rounded-lg items-center pr-4
+                {buttonClass}
                 group
                 "
             aria-label="Download Release"
         >
-            
-            <!-- Platform Icon -->
-            <!-- <i class="pl-6 {asset?.platform.icon}"></i> -->
-
             <!-- Asset Name -->
             <div class="p-1 flex shrink-[9999] pr-8">
-                <div class="platform-asset-name line-clamp-1! text-sm!">
+                <div class="platform-asset-name {nameClass} line-clamp-1! text-sm!">
                     {assetNameFormatted}
                 </div>
             </div>
@@ -213,20 +205,20 @@
             <!-- Download Size -->
             <div class="flex flex-row items-center gap-2 justify-end grow-[9999]">
 
-                <div class="min-w-fit text-right justify-self-end {assetSizeClass}">
+                <div class="{assetSizeClass} min-w-fit text-right justify-self-end">
                     {assetSizeFormatted}
                 </div>
 
                 <!-- Download Count -->
-                <div class="w-16 ml-2 text-right justify-self-end flex flex-row gap-1 justify-end items-center text-sm">
+                <div class="{downloadCountClass} w-16 ml-2 text-right justify-self-end flex flex-row gap-1 justify-end items-center text-sm">
                     <div class="ml-auto">
                         {downloadCountFormatted}
                     </div>
-                    <i class="fa-solid fa-fw fa-download text-blue-400 text-md"></i>
+                    <i class="fa-solid fa-fw fa-download text-md"></i>
                 </div>
 
                 <!-- File Extension -->
-                <div class="ml-2 w-8 justify-self-end text-right {extensionClass} text-sm! not-group-hover:truncate group-hover:min-w-fit group-hover:w-fit group-hover:max-w-fit">
+                <div class="{extensionClass} ml-2 w-8 justify-self-end text-right text-sm! not-group-hover:truncate group-hover:min-w-fit group-hover:w-fit group-hover:max-w-fit">
                     {asset?.extension}
                 </div>
 
@@ -244,108 +236,128 @@
     @custom-variant dark (&:where(.dark, .dark *));
 
 
-    /* Platform Button -- Empty */
-    .platform-button-container-empty {
-        @apply opacity-0;
-        @apply pointer-events-none;
-    }
-
-    /* Platform Button -- Container */
-    .platform-button-container {
-        @apply w-full h-full;
-        @apply min-w-full;
-    }
-
 
     /* Platform Button -- Standard */
     .platform-button {
         @apply w-full;
         @apply h-full;
-        @apply bg-white;
-        @apply dark:bg-slate-900;
+        @apply overflow-clip;
         @apply rounded-sm;
-        @apply scale-100 hover:scale-101;
-        @apply outline-2 outline-offset-2 outline-solid outline-blue-300;
-        @apply dark:outline-blue-500;
 
+        @apply scale-100 hover:scale-101;
         @apply transition-all duration-100 ease-out;
 
-        @apply overflow-clip;
+        @apply bg-white;
+        @apply dark:bg-slate-900;
+
+        @apply outline-2 outline-offset-2 outline-solid outline-blue-300;
+        @apply dark:outline-blue-500;
     }
 
     .platform-name {
         @apply text-lg;
-        @apply text-blue-400;
-        @apply dark:text-blue-200;
+
+        @apply text-blue-500;
+        @apply dark:text-blue-400;
+    }
+    
+    .platform-download-size {
+        @apply text-blue-500;
+        @apply dark:text-blue-400;
     }
 
-    .platform-icon {
-        @apply text-4xl;
-        @apply text-blue-300;   /* <-- Lighter than the button */
+    .platform-download-count {
+        @apply font-semibold;
+
+        @apply text-blue-500;
+        @apply dark:text-blue-400;
     }
 
     .platform-extension {
         @apply text-base;
         @apply font-bold;
-        @apply text-blue-300;
+
+        @apply text-blue-500;
+        @apply dark:text-blue-400;
     }
 
     .platform-asset-name {
         @apply break-all text-left align-text-top text-xl line-clamp-3;
-        /* @apply text-shadow-2xs; */
-        /* @apply text-shadow-blue-300; */
+
+        @apply text-blue-500;
+        @apply dark:text-blue-400;
     }
 
     /* Platform Button -- Top Recommended */
     .platform-button-top-recommended {
-        @apply bg-white;
-        @apply dark:bg-slate-900;
-        @apply outline-blue-600;
-        @apply dark:outline-blue-200;
         @apply rounded-xl;
+
         @apply shadow-lg;
+
         @apply shadow-black/50;
         @apply dark:shadow-zinc-50/33;
+
+        @apply bg-white;
+        @apply dark:bg-slate-900;
+
+        @apply outline-blue-600;
+        @apply dark:outline-blue-300;
     }
 
     .platform-name-top-recommended {
         @apply text-xl;
+
         @apply text-blue-600;
-        @apply dark:text-blue-400;
+        @apply dark:text-slate-200;
     }
 
-    .platform-icon-top-recommended {
-        @apply text-8xl;
-        @apply text-blue-700;    /* <-- Darker than the button (should be the first thing anyone sees) */
-        @apply dark:text-blue-500;
+    .platform-download-size-top-recommended {
+        @apply text-xl;
+
+        @apply text-blue-600;
+        @apply dark:text-slate-200;
+    }
+
+    .platform-download-count-top-recommended {
+        @apply font-semibold;
+
+        @apply text-blue-600;
+        @apply dark:text-slate-200;
     }
 
     .platform-extension-top-recommended {
         @apply text-2xl;
+
         @apply text-blue-600;
-        @apply dark:text-blue-400;
+        @apply dark:text-slate-200;
     }
 
     /* Platform Button -- Recommended */
     .platform-button-recommended { 
         @apply outline-blue-600;
-        @apply text-blue-700;
-
-        @apply dark:text-blue-400;
-        @apply dark:outline-blue-500;
+        @apply dark:outline-blue-300;
     }
 
     .platform-name-recommended {
-        @apply text-blue-600;
-        @apply dark:text-blue-400;
+        @apply text-blue-700;
+        @apply dark:text-slate-200;
     }
 
-    .platform-icon-recommended {
+    .platform-download-size-recommended {
         @apply text-blue-700;
+        @apply dark:text-slate-200;
+    }
+
+    .platform-download-count-recommended {
+        @apply font-semibold;
+        
+        @apply text-blue-700;
+        @apply dark:text-slate-200;
     }
 
     .platform-extension-recommended {
-        @apply text-blue-600;
+        @apply text-blue-700;
+        @apply dark:text-slate-200;
     }
 
 

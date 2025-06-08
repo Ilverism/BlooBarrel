@@ -128,16 +128,6 @@
 
     });
 
-    function clearPlatformCurrentNameTarget() {
-
-        /*
-            Manually clear the target platform name.
-            Triggers on use of the scroll wheel.
-        */
-
-        assetPlatformCurrentNameTarget = null;
-
-    }
 
     let observer: IntersectionObserver;
     onMount(() => {
@@ -180,9 +170,6 @@
 
         for (const asset of assetsByPlatform) {
 
-            //...
-            console.log("Asset: ", asset);
-
             const assetPlatform = asset.platform;
 
             //New platform, create a new group
@@ -190,10 +177,12 @@
 
                 assetPlatforms.add(assetPlatform);
 
+                const groupIsRecommended = (userPlatformFull && userPlatformFull.name === assetPlatform.name);
+                console.log("Name: ", assetPlatform.name, " is recommended: ", groupIsRecommended);
                 assetGroupsOut.push({
                     platform: assetPlatform,
                     assets: [asset],
-                    isRecommended: (userPlatformFull === assetPlatform) && asset.isRecommended,
+                    isRecommended: groupIsRecommended,
                 });
 
                 continue;
@@ -204,7 +193,7 @@
             const existingGroup = assetGroupsOut.find(group => group.platform === assetPlatform);
             if (existingGroup) {
                 existingGroup.assets.push(asset);
-                existingGroup.isRecommended ||= (userPlatformFull === assetPlatform) && asset.isRecommended;
+                // existingGroup.isRecommended ||= (userPlatformFull === assetPlatform) && asset.isRecommended;
             }
 
         }
@@ -484,6 +473,7 @@
                     {#each assetsPerPlatform as assetGroup}
 
                         {@const sortedAssetGroup = assetGroupSort(assetGroup)}
+                        {@const isRecommendedGroup = sortedAssetGroup.isRecommended}
 
                         <div
                             class="header-flat text-lg ml-16 flex flex-row items-center"
@@ -498,7 +488,7 @@
                             {#each sortedAssetGroup.assets as asset}
 
                                 <div class="w-full h-fit ml-16 pr-16">
-                                    <PlatformButton asset={asset} isRecommended={sortedAssetGroup.isRecommended} listMode/>
+                                    <PlatformButton asset={asset} isRecommended={isRecommendedGroup} listMode/>
                                 </div>
 
                             {/each}
@@ -534,7 +524,7 @@
     }
     .recommended-asset {
         @apply bg-blue-600;
-        @apply dark:bg-blue-200;
+        @apply dark:bg-blue-300;
     }
 
     .recommended-asset-container {
