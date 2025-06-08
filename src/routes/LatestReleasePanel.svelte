@@ -43,8 +43,6 @@
 
     });
 
-    let viewAsList = $state(true);
-
     /*
         Assets Per Platform
 
@@ -226,7 +224,7 @@
                 </div>
 
                 <!-- Release Info -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text">
+                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text mr-auto">
 
                     <div class="header-flat flex! flex-row! items-center gap-4">
                         <div class="whitespace-nowrap">
@@ -247,28 +245,6 @@
                     </div>
 
                 </div>
-
-                <!-- Toggle View -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 text-slate-500 ml-auto mr-16">
-
-                    <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-100">
-
-                        <!-- Toggle View Button -->
-                        <button
-                            class="button-flat group"
-                            onclick={()=>{viewAsList = !viewAsList;}}
-                            aria-label="Toggle View"
-                        >
-                            <i class="fa-fw fa-solid {viewAsList?'fa-list-ul':'fa-table-cells-large'}"></i>
-                            <div class="group-hover:underline">
-                                Toggle View
-                            </div>
-                        </button>
-                        
-                    </div>
-                    
-                </div>
-
 
             </div>
 
@@ -298,91 +274,54 @@
                     All Downloads
                 </div>
 
-                <!-- Flex Grid of Assets -->
-                {#if !viewAsList}
-                    <div class="
-                        grid [grid-template-columns:repeat(auto-fit,_minmax(16rem,_1fr))]
-                        gap-x-4 gap-y-6 w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8
-                        assets-scrollbar
-                        "
-                    >
+                <!-- List of Assets -->
+                <!-- Platform Scroll Buttons -->
+                {#if assetPlatforms.length > 1}
+                    <div class="absolute flex flex-col gap-4 left-[0] -ml-12 top-1/2 -translate-y-1/2 w-fit h-fit">
+                        {#each assetPlatforms as platform}
+                            <button
+                                class="button-flat group text-lg ml-16 flex flex-row items-center"
+                                aria-label="Scroll to {platform.name} assets"
+                                onclick={() => scrollToPlatform(platform.name)}>
+                                <i class="group-hover:underline group-hover:scale-105 scale-100 transition-all duration-100 ease-out underline-offset-auto fa-fw {platform.icon}"></i>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
 
-                        <!-- {#each assetsByPlatform as asset}
-                            
-                            <div class="w-64 h-48 mx-auto">
-                                <PlatformButton asset={asset} isRecommended={asset.isRecommended}/>
-                            </div>
-                        {:else}
-                            <div class="text-slate-500 text-lg italic">
-                                No assets available for this platform.
-                            </div>
-                        {/each} -->
+                <!-- Assets Per Platform List -->
+                <div class="
+                    w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8 flex flex-col gap-4
+                    assets-scrollbar
+                    "
+                    bind:this={listEl}
+                >
 
-                        {#each assetsPerPlatform as assetGroup}
+                    {#each assetsPerPlatform as assetGroup}
+
+                        <div
+                            class="header-flat text-lg ml-16 flex flex-row items-center"
+                            data-platform={assetGroup.platform.name}
+                        >
+                            <i class="fa-fw {assetGroup.platform.icon}"></i>
+                            {assetGroup.platform.name}
+                        </div>
+
+                        <div class="flex flex-col items-center justify-start gap-3 w-full mb-4 ml-8">
 
                             {#each assetGroup.assets as asset}
 
-                                <div class="w-64 h-48 mx-auto">
-                                    <PlatformButton asset={asset} isRecommended={assetGroup.isRecommended}/>
+                                <div class="w-full h-fit ml-16 pr-16">
+                                    <PlatformButton asset={asset} isRecommended={assetGroup.isRecommended} listMode/>
                                 </div>
 
                             {/each}
 
-                        {/each}
-
-                    </div>
-                
-                <!-- List of Assets -->
-                {:else}
-                
-                    <!-- Platform Scroll Buttons -->
-                    {#if assetPlatforms.length > 1}
-                        <div class="absolute flex flex-col gap-4 left-[0] -ml-12 top-1/2 -translate-y-1/2 w-fit h-fit">
-                            {#each assetPlatforms as platform}
-                                <button
-                                    class="button-flat group text-lg ml-16 flex flex-row items-center"
-                                    aria-label="Scroll to {platform.name} assets"
-                                    onclick={() => scrollToPlatform(platform.name)}>
-                                    <i class="group-hover:underline group-hover:scale-105 scale-100 transition-all duration-100 ease-out underline-offset-auto fa-fw {platform.icon}"></i>
-                                </button>
-                            {/each}
                         </div>
-                    {/if}
 
-                    <!-- Assets Per Platform List -->
-                    <div class="
-                        w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8 flex flex-col gap-4
-                        assets-scrollbar
-                        "
-                        bind:this={listEl}
-                    >
+                    {/each}
 
-                        {#each assetsPerPlatform as assetGroup}
-
-                            <div
-                                class="header-flat text-lg ml-16 flex flex-row items-center"
-                                data-platform={assetGroup.platform.name}
-                            >
-                                <i class="fa-fw {assetGroup.platform.icon}"></i>
-                                {assetGroup.platform.name}
-                            </div>
-
-                            <div class="flex flex-col items-center justify-start gap-3 w-full mb-4 ml-8">
-
-                                {#each assetGroup.assets as asset}
-
-                                    <div class="w-full h-fit ml-16 pr-16">
-                                        <PlatformButton asset={asset} isRecommended={assetGroup.isRecommended} listMode/>
-                                    </div>
-
-                                {/each}
-
-                            </div>
-
-                        {/each}
-
-                    </div>
-                {/if}
+                </div>
 
             </div>
 
