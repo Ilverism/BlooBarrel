@@ -973,6 +973,7 @@
 
     @reference "tailwindcss";
     @custom-variant dark (&:where(.dark, .dark *));
+    @plugin 'tailwind-scrollbar';
 
     .search-bar {
         
@@ -991,13 +992,13 @@
     :global(.message-text) {
         @apply text-slate-500;
         @apply dark:text-slate-200;
-
     }
 
     :global(html, body) {
         @apply overflow-x-hidden;
         /* @apply overflow-y-scroll; */
         @apply h-full;
+        @apply dark:scheme-dark;
     }
 
     :global(body){
