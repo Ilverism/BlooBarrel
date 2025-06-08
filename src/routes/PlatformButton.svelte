@@ -139,7 +139,7 @@
             
             <!-- Asset Name -->
             <div class="px-6 py-8">
-                <div class="platform-asset-name {nameClass} text-2xl! text-shadow-[0_0_8px_var(--color-blue-400)] px-2">
+                <div class="platform-asset-name {nameClass} text-2xl! text-shadow-[0_0_8px] text-shadow-blue-400/50 shadow-op px-2">
                     {assetNameFormatted}
                 </div>
             </div>
