@@ -54,6 +54,7 @@
         platform: Platform;
         browser_download_url: string;
         isRecommended?: boolean;
+        download_count?: number;
     }
 
     const fileTypes: FileType[] = [
@@ -245,7 +246,7 @@
 
     });
 
-    let recommendedAsset = $derived.by(() => {
+    let assetTopRecommended = $derived.by(() => {
 
         /*
             Find the first asset that is recommended for the current platform.
@@ -254,24 +255,47 @@
             Default to the first asset if no recommended asset is found.
 
             Use null if no assets are found.
+
+            Here is the logic:
+                1. If there are no assets, return null.
+                2. Prioritize assets for the current platform.
+                3. Prioritize the asset with the most downloads.
+                4. If no assets are found, return null.
         */
 
         //No assets found, return null
         if (!filteredAssets.length) {
-            console.warn("No assets found for the current platform, can't recommend any.");
+            console.warn("No assets found for the latest release.");
             return null;
         }
 
-        const recommended = filteredAssets.find((asset: Asset) => asset.isRecommended);
+        let recommendedAssetOut = null;
 
-        //Got a recommended asset, return it
-        if (recommended) {
-            console.log("Recommended asset found:", $state.snapshot(recommended));
-            return recommended;
+        //Get assets for the detected/target platform
+        const assetsForDetectedPlatform = filteredAssets.filter((asset: Asset) => 
+            (asset.platform.name === userPlatformFull?.name)
+        );
+
+        if (assetsForDetectedPlatform.length) {
+
+            //Sort by downloads, descending
+            assetsForDetectedPlatform.sort((a: Asset, b: Asset) => {
+                return (b.download_count ?? 0) - (a.download_count ?? 0);
+            });
+
+            //Take the first asset
+            recommendedAssetOut = assetsForDetectedPlatform[0];
+
+        } else {
+
+            //No assets for the detected platform, take the first asset
+            recommendedAssetOut = filteredAssets[0];
+
         }
 
-        console.warn("No recommended asset found, returning the first asset.");
-        return filteredAssets[0] ?? null;
+        console.log("Top recommended asset:", recommendedAssetOut);
+        return recommendedAssetOut;
+
 
     });
 
@@ -902,7 +926,7 @@
                         <LatestReleasePanel
                             latestRelease={latestRelease}
                             assetsByPlatform={assetsByPlatform}
-                            assetRecommended={recommendedAsset}
+                            assetTopRecommended={assetTopRecommended}
                             performedFirstFetch={performedFirstFetch}
                             userPlatformFull={userPlatformFull}
                             assetSortingMode={assetSortingMode}
@@ -950,10 +974,10 @@
 
                     <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
                         <div>
-                            Welcome to BlooBarrel.
+                            Welcome to <b>BlooBarrel</b>: GitHub downloads made simple!
                         </div>
                         <div>
-                            Use the search bar above to fetch releases from a GitHub repository.
+                            Use the search bar above to get downloads from a GitHub repository.
                         </div>
 
                     </div>

@@ -8,7 +8,7 @@
     let {
         latestRelease,
         performedFirstFetch,
-        assetRecommended,
+        assetTopRecommended,
         assetsByPlatform,
         userPlatformFull,
         assetSortingMode,
@@ -428,7 +428,7 @@
             </div>
 
             <!-- Recommended Asset -->
-            {#if assetRecommended}
+            {#if assetTopRecommended}
 
                 <div class="recommended-asset-container max-w-[20%] min-w-[20%] max-h-[5%] aspect-square mt-16">
 
@@ -440,7 +440,7 @@
                     </div>
 
                     <div class="w-96 min-h-64 mt-4 ml-4 self-center">
-                        <PlatformButton asset={assetRecommended} isRecommended isTopRecommended/>
+                        <PlatformButton asset={assetTopRecommended} isRecommended isTopRecommended/>
                     </div>
                 </div>
                     
