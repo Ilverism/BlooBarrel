@@ -564,25 +564,14 @@
     });
 
     //Theme Toggle
-    // let darkTheme = $state(false);
     let darkTheme = localStore('darkTheme', false);
     $effect(() => {
-
-        // if (darkTheme) {
-        //     document.documentElement.classList.add('dark');
-        //     console.log("Dark theme enabled.");
-        // } else {
-        //     document.documentElement.classList.remove('dark');
-        //     console.log("Dark theme disabled.");
-        // }
         
         console.log("Toggling dark theme class based on state:", darkTheme.value);
         darkTheme.value = (darkTheme.value ?? false);
 
         document.documentElement.classList.toggle('dark', darkTheme.value);
         console.log("Dark theme toggled to:", darkTheme.value);
-
-
 
     });
 
@@ -596,6 +585,9 @@
         }
 
     });
+
+    //Asset Sorting Store
+    let assetSortingMode = localStore('assetSortingMode', 'downloads');
 
 </script>
 
@@ -909,12 +901,11 @@
                     <div class="min-w-[70%] w-full min-h-0 h-full px-16">
                         <LatestReleasePanel
                             latestRelease={latestRelease}
-                            releasesData={data.releases}
                             assetsByPlatform={assetsByPlatform}
                             assetRecommended={recommendedAsset}
                             performedFirstFetch={performedFirstFetch}
-                            showInformationPanels={showInformationPanels}
                             userPlatformFull={userPlatformFull}
+                            assetSortingMode={assetSortingMode}
                         />
                     </div>
 

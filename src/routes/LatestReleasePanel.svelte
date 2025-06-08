@@ -1,16 +1,17 @@
 <script lang="ts">
+    import { onDestroy, onMount } from 'svelte';
+
     
     import PlatformButton from './PlatformButton.svelte';
     import type { Platform } from './releases/Platform';
     
     let {
         latestRelease,
-        releasesData,
         performedFirstFetch,
         assetRecommended,
         assetsByPlatform,
-        showInformationPanels,
         userPlatformFull,
+        assetSortingMode,
     } = $props();
 
     console.log("Latest Release Panel: ", latestRelease);
@@ -59,6 +60,8 @@
 
     function scrollToPlatform(fullName: string) {
 
+        fullName=fullName.toLowerCase().trim();
+
         console.log("Attempting to scroll to platform section: ", fullName);
 
         //List element not set, can't scroll
@@ -75,6 +78,7 @@
         //Didn't find the header, can't scroll to it
         if (!header) {
             console.warn(`No header found for platform: ${fullName}`);
+            console.warn("Available headers: ", Array.from(listEl.querySelectorAll('[data-platform]')));
             return;
         }
 
@@ -84,6 +88,9 @@
             top: header.offsetTop - listEl.offsetTop - SCROLL_OFFSET_PX,
             behavior: 'smooth'
         });
+
+        //Set the target platform name if it is different from the current one
+        assetPlatformCurrentNameTarget = fullName;
 
     }
 
@@ -104,10 +111,67 @@
 
         //Sort platforms by name
         //platformsOut.sort((a, b) => a.name.localeCompare(b.name));
-
         return platformsOut;
 
     });
+
+    let assetPlatformCurrentNameTarget = $state<string|null>(null);
+    let assetPlatformCurrentName = $derived.by(() => {
+
+        //If no assets, return null
+        if (!assetsByPlatform.length)
+            return null
+
+        //Return the first asset's platform
+        console.log("Current Asset Platform Name: ", assetsByPlatform[0].platform.name);
+        return assetsByPlatform[0].platform.name;
+
+    });
+
+    function clearPlatformCurrentNameTarget() {
+
+        /*
+            Manually clear the target platform name.
+            Triggers on use of the scroll wheel.
+        */
+
+        assetPlatformCurrentNameTarget = null;
+
+    }
+
+    let observer: IntersectionObserver;
+    onMount(() => {
+
+        if (!listEl)
+            return;
+
+        observer = new IntersectionObserver(
+            entries => {
+                
+                //Pick the entry with the highest intersection ratio
+                const best = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+                if (best) {
+                    assetPlatformCurrentName = best.target.getAttribute('data-platform');
+                    if (assetPlatformCurrentNameTarget===assetPlatformCurrentName)
+                        assetPlatformCurrentNameTarget = null; //Reset target if it matches current
+                }
+            },
+            {
+                root: listEl,
+                threshold: 0.5                // 50 % of header visible
+            }
+        );
+
+        for (const h of Array.from(listEl.querySelectorAll('[data-platform]'))) {
+            observer.observe(h);
+        }
+
+        onDestroy(() => observer.disconnect());
+    });
+
 
     let assetsPerPlatform = $derived.by(() => {
 
@@ -161,7 +225,103 @@
         return assetGroupsOut;
 
     });
-   
+
+
+
+    let assetGroupSortType = $state(assetSortingMode.value);
+
+    function cycleAssetGroupSortType() {
+
+        /*
+            Cycles the asset group sort type.
+            Available types: alphabetical, size, downloads.
+        */
+
+        const sortTypes = ["alphabetical", "size", "downloads"];
+        const currentIndex = sortTypes.indexOf(assetGroupSortType);
+        const nextIndex = (currentIndex + 1) % sortTypes.length;
+        assetGroupSortType = sortTypes[nextIndex];
+
+        assetSortingMode.value = assetGroupSortType;
+
+    }
+
+    function assetGroupSortAlphabetically(assetGroup:AssetGroup) {
+
+        /*
+            Returns a sorted copy of the target asset group.
+
+            Sort alphabetically by platform name.
+            Maintain the case of the platform name.
+        */
+
+        return {
+            ...assetGroup,
+            assets: [...assetGroup.assets].sort((a, b) => {
+                return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+            })
+        };
+
+    }
+
+    function assetGroupSortBySize(assetGroup:AssetGroup) {
+
+        /*
+            Returns a sorted copy of the target asset group.
+
+            Sort by size (descending order).
+        */
+
+        return {
+            ...assetGroup,
+            assets: [...assetGroup.assets].sort((a, b) => {
+                return b.size - a.size;
+            })
+        };
+
+    }
+
+    function assetGroupSortByDownloads(assetGroup:AssetGroup) {
+
+        /*
+            Returns a sorted copy of the target asset group.
+
+            Sort by number of downloads (descending order).
+        */
+
+        return {
+            ...assetGroup,
+            assets: [...assetGroup.assets].sort((a, b) => {
+                return b.download_count - a.download_count;
+            })
+        };
+
+    }
+
+
+    function assetGroupSort(assetGroup:AssetGroup) {
+
+        /*
+            Returns a sorted copy of the target asset group.
+
+            Calls the other sorting functions.
+        */
+
+        const sortFunctionMap:any = {
+            alphabetical: assetGroupSortAlphabetically,
+            size: assetGroupSortBySize,
+            downloads: assetGroupSortByDownloads,
+        };
+
+        const sortFunction = sortFunctionMap[assetGroupSortType];
+        if (sortFunction)
+            return sortFunction(assetGroup);
+
+
+        //By default, return the asset group as is
+        return assetGroup;
+
+    }
 
 </script>
 
@@ -246,6 +406,25 @@
 
                 </div>
 
+                <!-- Toggle Sorting -->
+                <div class="flex flex-col items-start justify-center w-fit gap-2 text-slate-500 ml-auto mr-16">
+
+                    <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-100">
+
+                        <!-- Toggle Sort Mode -->
+                        <button
+                            class="button-flat group"
+                            onclick={cycleAssetGroupSortType}
+                            aria-label="Toggle View"
+                        >
+                            <i class="fa-fw fa-solid fa-sort"></i>
+                            <div class="group-hover:underline">
+                                Sort By: <b class="capitalize">{assetGroupSortType}</b>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Recommended Asset -->
@@ -274,24 +453,29 @@
                     All Downloads
                 </div>
 
-                <!-- List of Assets -->
                 <!-- Platform Scroll Buttons -->
                 {#if assetPlatforms.length > 1}
                     <div class="absolute flex flex-col gap-4 left-[0] -ml-12 top-1/2 -translate-y-1/2 w-fit h-fit">
+                        
                         {#each assetPlatforms as platform}
+
+                            {@const isCurrentPlatform = (platform.name.toLowerCase() === (assetPlatformCurrentNameTarget===null?assetPlatformCurrentName.toLowerCase():assetPlatformCurrentNameTarget.toLowerCase()))}
+
                             <button
-                                class="button-flat group text-lg ml-16 flex flex-row items-center"
+                                class="button-flat group text-lg ml-16 flex flex-row items-center asset-platform-button {isCurrentPlatform?'asset-platform-button-current':''}"
                                 aria-label="Scroll to {platform.name} assets"
-                                onclick={() => scrollToPlatform(platform.name)}>
-                                <i class="group-hover:underline group-hover:scale-105 scale-100 transition-all duration-100 ease-out underline-offset-auto fa-fw {platform.icon}"></i>
+                                onclick={() => scrollToPlatform(platform.name)}
+                            >
+                                <i class="group-hover:underline underline-offset-auto fa-fw {platform.icon}"></i>
                             </button>
                         {/each}
+
                     </div>
                 {/if}
 
                 <!-- Assets Per Platform List -->
                 <div class="
-                    w-full mt-4 overflow-y-scroll overflow-x-clip py-4 pr-8 flex flex-col gap-4
+                    w-full mt-4 overflow-y-scroll overflow-x-clip  pr-8 flex flex-col gap-4
                     assets-scrollbar
                     "
                     bind:this={listEl}
@@ -299,20 +483,22 @@
 
                     {#each assetsPerPlatform as assetGroup}
 
+                        {@const sortedAssetGroup = assetGroupSort(assetGroup)}
+
                         <div
                             class="header-flat text-lg ml-16 flex flex-row items-center"
-                            data-platform={assetGroup.platform.name}
+                            data-platform={sortedAssetGroup.platform.name.toLowerCase()}
                         >
-                            <i class="fa-fw {assetGroup.platform.icon}"></i>
-                            {assetGroup.platform.name}
+                            <i class="fa-fw {sortedAssetGroup.platform.icon}"></i>
+                            {sortedAssetGroup.platform.name}
                         </div>
 
                         <div class="flex flex-col items-center justify-start gap-3 w-full mb-4 ml-8">
 
-                            {#each assetGroup.assets as asset}
+                            {#each sortedAssetGroup.assets as asset}
 
                                 <div class="w-full h-fit ml-16 pr-16">
-                                    <PlatformButton asset={asset} isRecommended={assetGroup.isRecommended} listMode/>
+                                    <PlatformButton asset={asset} isRecommended={sortedAssetGroup.isRecommended} listMode/>
                                 </div>
 
                             {/each}
@@ -370,6 +556,24 @@
         @apply scrollbar-thin;
         @apply scrollbar-thumb-blue-300 scrollbar-track-blue-100;
         @apply dark:scrollbar-thumb-blue-500 dark:scrollbar-track-slate-900;
+    }
+
+    .asset-platform-button {
+        @apply text-neutral-700;
+        @apply dark:text-neutral-100;
+        @apply flex flex-row gap-2 items-center justify-center;
+        @apply hover:cursor-pointer;
+        @apply hover:scale-105 scale-100 transition-all duration-100 ease-out;
+    }
+
+    .asset-platform-button-current {
+        @apply text-black;
+        @apply dark:text-white;
+        @apply scale-140;
+        @apply hover:scale-150;
+        /* @apply text-shadow-lg; */
+        /* @apply text-shadow-blue-400; */
+        @apply text-shadow-[0_0_12px_var(--color-blue-400)];
     }
 
 </style>
