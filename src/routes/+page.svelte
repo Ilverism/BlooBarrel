@@ -624,7 +624,7 @@
                     <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
                     <div class="flex flex-col relative">
                         <span class="text-blue-400 self-center">BlooBarrel</span>
-                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.01</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.02</span>
                     </div>
                 </div>
             
