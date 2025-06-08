@@ -195,6 +195,7 @@
                 cursor-pointer relative flex flex-row bg-zinc-50 w-full rounded-lg items-center pr-4
                 outline-2 outline-offset-2 outline-solid outline-blue-300
                 platform-button
+                group
                 "
             aria-label="Download Release"
         >
@@ -225,7 +226,7 @@
                 </div>
 
                 <!-- File Extension -->
-                <div class="ml-2 w-8 justify-self-end text-right {extensionClass} text-sm!">
+                <div class="ml-2 w-8 justify-self-end text-right {extensionClass} text-sm! not-group-hover:truncate group-hover:min-w-fit group-hover:w-fit group-hover:max-w-fit">
                     {asset?.extension}
                 </div>
 
