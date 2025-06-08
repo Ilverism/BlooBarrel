@@ -636,13 +636,22 @@
             <div class="flex flex-row items-center justify-between py-4 px-8 shadow-md z-20 relative">
 
                 <!-- Logo & Title -->
-                <div class="ml-16 mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2">
+                <a
+                    class="hover:scale-105 hover:cursor-pointer group ml-16 mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2"
+                    aria-label="Open BlooBarrel in GitHub"
+                    target="_blank"
+                    href="https://github.com/Ilverism/BlooBarrel"
+                >
                     <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
                     <div class="flex flex-col relative">
                         <span class="text-blue-400 self-center">BlooBarrel</span>
-                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.03</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. beta-2025-06.03</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap not-group-hover:hidden pt-1">
+                            <i class="fa-solid fa-fw fa-arrow-up-right-from-square text-blue-400/50"></i>
+                            Open in GitHub
+                        </span>
                     </div>
-                </div>
+                </a>
             
                 <!-- Header Settings -->
                 <div class="flex flex-row-reverse gap-12">
