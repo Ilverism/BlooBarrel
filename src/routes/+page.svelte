@@ -619,7 +619,7 @@
 
 {#if !darkThemeStoreInitialized}
     <div
-        class="absolute inset-0 bg-gray-100 dark:bg-gray-900 z-50 items-center justify-center min-w-screen min-h-screen flex flex-col gap-2 z-50"
+        class="absolute inset-0 bg-gray-100 dark:bg-gray-900 items-center justify-center min-w-screen min-h-screen flex flex-col gap-2 z-50"
         out:blur={{ duration: 800, amount: 8, delay: 200 }}
     >
         <div class="text-lg text-gray-700 dark:text-gray-300 italic">Loading...</div>
