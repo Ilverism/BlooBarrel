@@ -1,10 +1,11 @@
 <script lang="ts">
     
-    import { fade, fly, scale, slide } from 'svelte/transition';
+    import { fade, fly, scale, slide, blur } from 'svelte/transition';
     import { page } from '$app/state';
     import { Toggle } from "flowbite-svelte";
     import { base } from '$app/paths';
     import type { Platform } from './releases/Platform';
+    import { localStore } from '$lib/localStore.svelte';
 
     let data:any = $state({
         releases: [],
@@ -563,408 +564,433 @@
     });
 
     //Theme Toggle
-    let darkTheme = $state(false);
+    // let darkTheme = $state(false);
+    let darkTheme = localStore('darkTheme', false);
     $effect(() => {
 
-        if (darkTheme) {
-            document.documentElement.classList.add('dark');
-            console.log("Dark theme enabled.");
-        } else {
-            document.documentElement.classList.remove('dark');
-            console.log("Dark theme disabled.");
+        // if (darkTheme) {
+        //     document.documentElement.classList.add('dark');
+        //     console.log("Dark theme enabled.");
+        // } else {
+        //     document.documentElement.classList.remove('dark');
+        //     console.log("Dark theme disabled.");
+        // }
+        
+        console.log("Toggling dark theme class based on state:", darkTheme.value);
+        darkTheme.value = (darkTheme.value ?? false);
+
+        document.documentElement.classList.toggle('dark', darkTheme.value);
+        console.log("Dark theme toggled to:", darkTheme.value);
+
+
+
+    });
+
+    let darkThemeStoreInitialized = $state(false);
+    $effect(() => {
+
+        //Initialize the dark theme store if it hasn't been initialized yet
+        if (!darkThemeStoreInitialized) {
+            darkThemeStoreInitialized = true;
+            console.log("Dark theme store initialized with value:", darkTheme.value);
         }
+
     });
 
 </script>
 
 
 
-<div class="flex flex-col min-h-screen">
+{#if !darkThemeStoreInitialized}
+    <div
+        class="absolute inset-0 bg-gray-100 dark:bg-gray-900 z-50 items-center justify-center min-w-screen min-h-screen flex flex-col gap-2 z-50"
+        out:blur={{ duration: 800, amount: 8, delay: 200 }}
+    >
+        <div class="text-lg text-gray-700 dark:text-gray-300 italic">Loading...</div>
+        <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8 animate-pulse">
+    </div>
+{:else}
 
-    <!-- Sticky Page Header -->
-    <div class="top-0 z-10 bg-base-100 header-area" id="page-header">
+    <div class="flex flex-col min-h-screen">
 
-        <!-- Header -->
-        <div class="flex flex-row items-center justify-between py-4 px-8 shadow-md z-20 relative">
+        <!-- Sticky Page Header -->
+        <div class="top-0 z-10 bg-base-100 header-area" id="page-header">
 
-            <!-- Logo & Title -->
-            <div class="ml-16 mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2">
-                <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
-                <div class="flex flex-col relative">
-                    <span class="text-blue-400 self-center">BlooBarrel</span>
-                    <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.01</span>
-                </div>
-            </div>
-        
-            <!-- Header Settings -->
-            <div class="flex flex-row-reverse gap-12">
+            <!-- Header -->
+            <div class="flex flex-row items-center justify-between py-4 px-8 shadow-md z-20 relative">
 
-                <!-- Detected Platform -->
-                <div class="flex flex-col min-w-48">
-
-                    <div class="header-flat">
-                        {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}   
-                    </div>
-
-                    <div class="group relative inline-block min-w-48 hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">
-
-                        <!-- The real select, stretched over the whole area but invisible -->
-                        <select
-                            bind:value={newUserPlatformName}
-                            onchange={userPlatformSet}
-                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none"      
-                            aria-label="Platform"
-                            name="platform-select"
-                        >
-                            {#each platforms as platform}
-                                <option value={platform.name}>
-                                    {platform.name}
-                                </option>
-                            {/each}
-                        </select>
-
-                        <!-- What the user actually sees -->
-                        <label class="flex items-center gap-2 pointer-events-none select-none w-full" for="platform-select">
-                            <i class="{userPlatformFull?.icon} text-blue-600"></i>
-                            <span class="text-sm font-bold message-text w-full flex flex-row items-center gap-2">
-                                {userPlatformFull?.name ?? 'Unknown'}
-                                <i class="fa-solid fa-chevron-down text-slate-400 opacity-50 group-hover:opacity-100 ml-auto"></i>
-                            </span>
-                        </label>
-                    </div>
-
-                </div>
-
-                <!-- Theme Toggle -->
-                <div class="flex flex-col min-w-48">
-
-                    <div class="header-flat">
-                        Toggle Theme
-                    </div>
-
-                    <!-- Toggle Switch -->
-                    <div class="flex flex-row">
-                        <Toggle
-                            bind:checked={darkTheme}
-                            color="blue"
-                            class="py-1 hover:cursor-pointer"
-                            aria-label="Toggle Page Theme"
-                        >
-                        </Toggle>
-
-
-                        <i class="fa-solid fa-fw {darkTheme?'fa-moon':'fa-sun'} message-text py-1 scale-125 self-center"></i>
+                <!-- Logo & Title -->
+                <div class="ml-16 mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2">
+                    <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
+                    <div class="flex flex-col relative">
+                        <span class="text-blue-400 self-center">BlooBarrel</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap">ver. beta-2025-06.01</span>
                     </div>
                 </div>
+            
+                <!-- Header Settings -->
+                <div class="flex flex-row-reverse gap-12">
 
-                <!-- Information Panel Toggle -->
-                {#if performedFirstFetch}
-                    <div class="flex flex-col min-w-48" in:fade={{duration: 800}}>
+                    <!-- Detected Platform -->
+                    <div class="flex flex-col min-w-48">
 
                         <div class="header-flat">
-                            Information Panels
+                            {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}   
+                        </div>
+
+                        <div class="group relative inline-block min-w-48 hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">
+
+                            <!-- The real select, stretched over the whole area but invisible -->
+                            <select
+                                bind:value={newUserPlatformName}
+                                onchange={userPlatformSet}
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none select-element"      
+                                aria-label="Platform"
+                                name="platform-select"
+                            >
+                                {#each platforms as platform}
+                                    <option value={platform.name}>
+                                        {platform.name}
+                                    </option>
+                                {/each}
+                            </select>
+
+                            <!-- What the user actually sees -->
+                            <label class="flex items-center gap-2 pointer-events-none select-none w-full" for="platform-select">
+                                <i class="{userPlatformFull?.icon} text-blue-600"></i>
+                                <span class="text-sm font-bold message-text w-full flex flex-row items-center gap-2">
+                                    {userPlatformFull?.name ?? 'Unknown'}
+                                    <i class="fa-solid fa-chevron-down text-slate-400 opacity-50 group-hover:opacity-100 ml-auto"></i>
+                                </span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <div class="flex flex-col min-w-48">
+
+                        <div class="header-flat">
+                            Toggle Theme
                         </div>
 
                         <!-- Toggle Switch -->
-                        <Toggle
-                            bind:checked={showInformationPanels}
-                            color="blue"
-                            class="py-1 hover:cursor-pointer"
-                            aria-label="Toggle Information Panels"
-                        >
-                        </Toggle>
+                        <div class="flex flex-row">
+                            <Toggle
+                                bind:checked={darkTheme.value}
+                                color="blue"
+                                class="py-1 hover:cursor-pointer"
+                                aria-label="Toggle Page Theme"
+                            >
+                            </Toggle>
 
+
+                            <i class="fa-solid fa-fw {darkTheme.value?'fa-moon':'fa-sun'} message-text py-1 scale-125 self-center"></i>
+                        </div>
                     </div>
-                {/if}
+
+                    <!-- Information Panel Toggle -->
+                    {#if performedFirstFetch}
+                        <div class="flex flex-col min-w-48" in:fade={{duration: 800}}>
+
+                            <div class="header-flat">
+                                Information Panels
+                            </div>
+
+                            <!-- Toggle Switch -->
+                            <Toggle
+                                bind:checked={showInformationPanels}
+                                color="blue"
+                                class="py-1 hover:cursor-pointer w-fit"
+                                aria-label="Toggle Information Panels"
+                            >
+                            </Toggle>
+
+                        </div>
+                    {/if}
+
+                </div>
 
             </div>
+
+            <hr class="text-slate-400/25"/>
 
         </div>
 
-        <hr class="text-slate-400/25"/>
 
-    </div>
-
-
-    <!-- Search Area -->
-    <!-- <div class="flex flex-col items-center justify-center bg-blue-100 gap-4 relative lg:px-24 "> -->
-    <div class="search-area flex flex-col items-center justify-center gap-4 relative lg:px-24">
+        <!-- Search Area -->
+        <!-- <div class="flex flex-col items-center justify-center bg-blue-100 gap-4 relative lg:px-24 "> -->
+        <div class="search-area flex flex-col items-center justify-center gap-4 relative lg:px-24">
 
 
-        <!-- Search Panel -->
-        {#if searchPanelOpen}
-            <div class="
-                grid 
-                grid-cols-[1fr_auto_1fr]  /* 1 fr │ auto │ 1 fr  */
-                items-center
-                gap-4
-                pt-8 pb-10 w-full
-                "
-                in:slide={{ duration: 200 }}   
-                out:slide={{ duration: 200 }}
-            >
+            <!-- Search Panel -->
+            {#if searchPanelOpen}
+                <div class="
+                    grid 
+                    grid-cols-[1fr_auto_1fr]
+                    items-center
+                    gap-4
+                    pt-8 pb-10 w-full
+                    "
+                    in:slide={{ duration: 200 }}   
+                    out:slide={{ duration: 200 }}
+                >
 
-                <!-- Instructions Div -->
-                <div class="flex flex-col mx-auto min-w-114 max-w-[67%] justify-self-start">
+                    <!-- Instructions Div -->
+                    <div class="flex flex-col mx-auto min-w-114 max-w-[67%] justify-self-start">
 
-                    <button class="w-full group hover:cursor-pointer mb-4" onclick={() => displayInstructions = !displayInstructions} aria-label="Toggle Instructions">
+                        <button class="w-full group hover:cursor-pointer mb-4" onclick={() => displayInstructions = !displayInstructions} aria-label="Toggle Instructions">
 
-                        <!-- Instructions Header -->
-                        <div class="header-flat mr-auto w-full">
-                            <div class="flex flex-row items-center gap-2">
-                                <div class="select-none">
-                                    Instructions
-                                </div>
-                                <i class="mt-2 ml-auto fa-solid fa-fw fa-chevron-right text-sm font-light {displayInstructions?'rotate-90':'rotate-0'} group-hover:scale-115 transition-all duration-200 ease-in-out"></i>
-                            </div>  
-                        </div>
-
-                    </button>
-
-                    <!-- Instructions Content -->
-                    {#if displayInstructions}
-                        <span out:fade={{ duration: 200 }} in:fade={{ duration: 200 }}>
-                            <ul class="list-disc list-inside text-sm instructions-text max-w-112 space-y-4"
-                                in:slide={{ duration: 400 }}   
-                                out:slide={{ duration: 400 }}
-                            >
-                                <li>
-                                    Paste a <b>GitHub project URL</b> and click 🔍.
-                                </li>
-                                <li>
-                                    The project's most recent <b>Release</b> (where ready-to-download files are available) will be shown.
-                                </li>
-                                <li>
-                                    Files that match <b>your computer</b> (Windows/macOS/Linux) will be highlighted automatically (you can change this in the header).
-                                </li>
-                                <li>
-                                    Click any file to <b>download</b> it.
-                                </li>
-                                <li>
-                                    Click the <b>Copy Shareable Link</b> button to copy a link to this page, which you can share with others.
-                                </li>
-                            </ul>
-                        </span>
-                    {/if}
-
-                </div>
-
-                <!-- Search Input Area -->
-                <div class="justify-self-center flex flex-col gap-4 w-3xl mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%] my-2">
-
-                    <!-- Search Bar Header -->
-                    <div class="w-full">
-                        <div class="header-flat">
-                            Search for Releases
-                        </div>
-                    </div>
-
-                    <!-- Search Bar -->
-                    <div class="flex flex-row items-center justify-center w-full">
-
-                        <!-- Input Field -->
-                        <input
-                            bind:value={searchPanelText}
-                            name="search-bar"
-                            type="text"
-                            placeholder="Paste a GitHub link (e.g. https://github.com/owner/project)"
-                            class="input input-bordered min-w-full search-bar px-4 flex-1"
-                        />
-
-                        <!-- Submit Button -->
-                        <div class="flex items-center ml-12 min-w-16 min-h-16">
-
-                            <!-- Fetching, show loading circle -->
-                            {#if isFetching}
-                                <i class="fa fa-spinner text-blue-300 animate-spin ml-4 scale-200"></i>
-
-                            <!-- Not fetching, show button -->
-                            {:else}
-                                <button
-                                    disabled={!searchPanelText}
-                                    class="group disabled:opacity-50 flex items-center min-w-16 min-h-16 justify-center button-standard rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none"
-                                    onclick={() => fetchFromURL()}
-                                    aria-label="Fetch Releases"
-                                >
-                                    <i class="fa-solid scale-150 fa-magnifying-glass text-blue-300 group-disabled:text-gray-300"></i>
-                                </button>
-                            {/if}
-
-                        </div>
-
-                    </div>
-
-                    <!-- Rate Limit Indicator -->
-                    {#if performedRateLimitFetch && (rateLimitRemaining < RATE_LIMIT_WARNING)}
-                        <div class="warning-text text-sm! mb-2">
-                            <i class="fa-fw fa-solid fa-triangle-exclamation mr-2"></i>
-                            <span>
-                                Low rate limit: {rateLimitRemaining}/{rateLimitMax} remaining. Resets at {rateLimitResetTimeString}.
-                            </span>
-                        </div>
-                        <!-- <a aria-label="Authenticate GitHub" class="button-flat group text-red-800! text-sm! s-y_bCXRrkrYfP" href={PUBLIC_GH_OAUTH_WORKER}>
-                            <i class="fa-fw fa-brands fa-github s-y_bCXRrkrYfP"></i>
-                            <div class="group-hover:underline s-y_bCXRrkrYfP">
-                                Authenticate with GitHub to increase your rate limit.
+                            <!-- Instructions Header -->
+                            <div class="header-flat mr-auto w-full">
+                                <div class="flex flex-row items-center gap-2">
+                                    <div class="select-none">
+                                        Instructions
+                                    </div>
+                                    <i class="mt-2 ml-auto fa-solid fa-fw fa-chevron-right text-sm font-light {displayInstructions?'rotate-90':'rotate-0'} group-hover:scale-115 transition-all duration-200 ease-in-out"></i>
+                                </div>  
                             </div>
-                        </a> -->
-                    {/if}
 
-                </div>
+                        </button>
 
-                <!-- Other -->
-                <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-125 max-w-[75%]">
+                        <!-- Instructions Content -->
+                        {#if displayInstructions}
+                            <span out:fade={{ duration: 200 }} in:fade={{ duration: 200 }}>
+                                <ul class="list-disc list-inside text-sm instructions-text max-w-112 space-y-4"
+                                    in:slide={{ duration: 400 }}   
+                                    out:slide={{ duration: 400 }}
+                                >
+                                    <li>
+                                        Paste a <b>GitHub project URL</b> and click 🔍.
+                                    </li>
+                                    <li>
+                                        The project's most recent <b>Release</b> (where ready-to-download files are available) will be shown.
+                                    </li>
+                                    <li>
+                                        Files that match <b>your computer</b> (Windows/macOS/Linux) will be highlighted automatically (you can change this in the header).
+                                    </li>
+                                    <li>
+                                        Click any file to <b>download</b> it.
+                                    </li>
+                                    <li>
+                                        Click the <b>Copy Shareable Link</b> button to copy a link to this page, which you can share with others.
+                                    </li>
+                                </ul>
+                            </span>
+                        {/if}
 
-                    <!-- Copy Shareable URL -->
-                    <button
-                        class="button-flat group {fetchedURL?'':'button-flat-disabled'}"
-                        onclick={buildShareableURL}
-                        aria-label="Copy URL"
-                    >
-                        <i class="fa-fw fa-solid fa-link"></i>
-                        <div class="group-hover:underline">
-                            Copy Shareable Link
+                    </div>
+
+                    <!-- Search Input Area -->
+                    <div class="justify-self-center flex flex-col gap-4 w-3xl mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%] my-2">
+
+                        <!-- Search Bar Header -->
+                        <div class="w-full">
+                            <div class="header-flat">
+                                Search for Releases
+                            </div>
                         </div>
-                    </button>
-                    
-                </div>
 
-            </div>
-        {/if}
+                        <!-- Search Bar -->
+                        <div class="flex flex-row items-center justify-center w-full">
 
-        <!-- Dropdown Toggle Button -->
-        <button
-            onclick={searchPanelToggle}
-            class="
-                group absolute left-1/2 bottom-0            /* anchor: bottom-centre of header */
-                -translate-x-1/2  translate-y-1/2           /* shove left 50 %, down 50 %   */
-                w-16 h-16 rounded-full button-standard shadow-lg
-                border border-slate-400/50 border-t-0
-                hover:scale-115 hover:bg-slate-100 hover:cursor-pointer
-                z-50
-                {performedFirstFetch ? 'scale-100' : 'scale-0 pointer-events-none'} transition-all duration-100 ease-in-out
-            "
-            aria-label="Fetch Releases"
-        >
-
-                {#if searchPanelOpen}
-                    <i class="fa-solid fa-chevron-up text-slate-400"></i>
-                {:else}
-                    <i class="fa-solid fa-magnifying-glass text-blue-300 block! group-hover:hidden!"></i>
-                    <i class="fa-solid fa-chevron-down text-slate-400 hidden! group-hover:block!"></i>
-                {/if}
-
-        </button>
-
-    </div>
-
-
-    <!-- Main Panel Area -->
-    <!-- <div class="relative w-full h-full py-8">  -->
-    <div class="relative w-full h-full py-8"> 
-        {#if isFetching}
-            <main
-                class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-64"
-                in:fade={{ duration: 500, delay: 500 }}
-                out:fade={{ duration: 500 }}
-            >
-                <i class="fa-solid fa-spinner text-9xl text-blue-300 animate-spin mb-24 [animation-duration:2.0s]"></i>
-                <div class="text-3xl italic text-slate-400 font-light whitespace-pre flex flex-col items-center justify-center gap-4">
-                    Fetching releases...
-                </div>
-            </main>
-        {:else if performedFirstFetch}
-            <main
-                class="relative flex flex-row w-full h-full min-h-0 shrink items-start justify-center"
-                in:fade={{ duration: 500, delay: 500 }} 
-                out:fade={{ duration: 500 }}
-            >
-                    
-                <div class="min-w-[70%] w-full min-h-0 h-full px-16">
-                    <LatestReleasePanel
-                        latestRelease={latestRelease}
-                        releasesData={data.releases}
-                        assetsByPlatform={assetsByPlatform}
-                        assetRecommended={recommendedAsset}
-                        performedFirstFetch={performedFirstFetch}
-                        showInformationPanels={showInformationPanels}
-                        userPlatformFull={userPlatformFull}
-                    />
-                </div>
-
-                <!-- Information Panel Stack -->
-                {#if showInformationPanels}
-                    <div
-                        class="min-w-[30%] flex flex-col items-start justify-start w-full h-full shrink gap-8 pr-16 max-h-full"
-                        id="information-panel-stack"
-                    >
-
-                        <!-- Repo Information Panel -->
-                        <div class="flex-1 min-h-0 w-full">
-                            <RepoInformationPanel
-                                repo={repoMeta}
-                                readme={readme}
-                                topics={topics}
-                                fetchedURL={fetchedURL}
+                            <!-- Input Field -->
+                            <input
+                                bind:value={searchPanelText}
+                                name="search-bar"
+                                type="text"
+                                placeholder="Paste a GitHub link (e.g. https://github.com/owner/project)"
+                                class="input input-bordered min-w-full search-bar px-4 flex-1"
                             />
+
+                            <!-- Submit Button -->
+                            <div class="flex items-center ml-12 min-w-16 min-h-16">
+
+                                <!-- Fetching, show loading circle -->
+                                {#if isFetching}
+                                    <i class="fa fa-spinner text-blue-300 animate-spin ml-4 scale-200"></i>
+
+                                <!-- Not fetching, show button -->
+                                {:else}
+                                    <button
+                                        disabled={!searchPanelText}
+                                        class="group disabled:opacity-50 flex items-center min-w-16 min-h-16 justify-center button-standard rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none"
+                                        onclick={() => fetchFromURL()}
+                                        aria-label="Fetch Releases"
+                                    >
+                                        <i class="fa-solid scale-150 fa-magnifying-glass text-blue-300 group-disabled:text-gray-300"></i>
+                                    </button>
+                                {/if}
+
+                            </div>
+
                         </div>
 
-                        <!-- Release Information Panel -->
-                        {#if assetsByPlatform.length}
-                            <div class="flex-1 min-h-0 w-full">
-                                <ReleaseInformationPanel  
-                                    release={latestRelease}
-                                />
+                        <!-- Rate Limit Indicator -->
+                        {#if performedRateLimitFetch && (rateLimitRemaining < RATE_LIMIT_WARNING)}
+                            <div class="warning-text text-sm! mb-2">
+                                <i class="fa-fw fa-solid fa-triangle-exclamation mr-2"></i>
+                                <span>
+                                    Low rate limit: {rateLimitRemaining}/{rateLimitMax} remaining. Resets at {rateLimitResetTimeString}.
+                                </span>
                             </div>
                         {/if}
 
                     </div>
-                {/if}
 
-            </main>
-        {:else if !isFetching}
-            <main
-                class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-80"
-                in:fade={{ duration: 3000 }}   
-                out:fade={{ duration: 500 }}
-            >
-                    
-                <i class="fa-solid fa-chevron-down text-9xl text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"></i>
+                    <!-- Other -->
+                    <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-125 max-w-[75%]">
 
-                <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
-                    <div>
-                        Welcome to BlooBarrel.
-                    </div>
-                    <div>
-                        Use the search bar above to fetch releases from a GitHub repository.
+                        <!-- Copy Shareable URL -->
+                        <button
+                            class="button-flat group {fetchedURL?'':'button-flat-disabled'}"
+                            onclick={buildShareableURL}
+                            aria-label="Copy URL"
+                        >
+                            <i class="fa-fw fa-solid fa-link"></i>
+                            <div class="group-hover:underline">
+                                Copy Shareable Link
+                            </div>
+                        </button>
+                        
                     </div>
 
                 </div>
+            {/if}
 
-                <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
+            <!-- Dropdown Toggle Button -->
+            <button
+                onclick={searchPanelToggle}
+                class="
+                    group absolute left-1/2 bottom-0            /* anchor: bottom-centre of header */
+                    -translate-x-1/2  translate-y-1/2           /* shove left 50 %, down 50 %   */
+                    w-16 h-16 rounded-full button-standard shadow-lg
+                    border border-slate-400/50 border-t-0
+                    hover:scale-115 hover:bg-slate-100 hover:cursor-pointer
+                    z-40
+                    {performedFirstFetch ? 'scale-100' : 'scale-0 pointer-events-none'} transition-all duration-100 ease-in-out
+                "
+                aria-label="Fetch Releases"
+            >
 
-                <!-- Copyable Example -->
-                <button class="group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4"
-                                onclick={() => {
-                            navigator.clipboard.writeText('https://github.com/electron/electron/');
-                            console.log("Copied example URL to clipboard!");
-                        }}>
-                    Try an example (click to copy, then paste into the search bar):
-                    <span class="button-flat">
-                        <i class="fa-fw fa-solid fa-link"></i>
-                        <div class="group-hover:underline">
-                            https://github.com/electron/electron/
+                    {#if searchPanelOpen}
+                        <i class="fa-solid fa-chevron-up text-slate-400"></i>
+                    {:else}
+                        <i class="fa-solid fa-magnifying-glass text-blue-300 block! group-hover:hidden!"></i>
+                        <i class="fa-solid fa-chevron-down text-slate-400 hidden! group-hover:block!"></i>
+                    {/if}
+
+            </button>
+
+        </div>
+
+
+        <!-- Main Panel Area -->
+        <!-- <div class="relative w-full h-full py-8">  -->
+        <div class="relative w-full h-full py-8"> 
+            {#if isFetching}
+                <main
+                    class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-64"
+                    in:fade={{ duration: 500, delay: 500 }}
+                    out:fade={{ duration: 500 }}
+                >
+                    <i class="fa-solid fa-spinner text-9xl text-blue-300 animate-spin mb-24 [animation-duration:2.0s]"></i>
+                    <div class="text-3xl italic text-slate-400 font-light whitespace-pre flex flex-col items-center justify-center gap-4">
+                        Fetching releases...
+                    </div>
+                </main>
+            {:else if performedFirstFetch}
+                <main
+                    class="relative flex flex-row w-full h-full min-h-0 shrink items-start justify-center"
+                    in:fade={{ duration: 500, delay: 500 }} 
+                    out:fade={{ duration: 500 }}
+                >
+                        
+                    <div class="min-w-[70%] w-full min-h-0 h-full px-16">
+                        <LatestReleasePanel
+                            latestRelease={latestRelease}
+                            releasesData={data.releases}
+                            assetsByPlatform={assetsByPlatform}
+                            assetRecommended={recommendedAsset}
+                            performedFirstFetch={performedFirstFetch}
+                            showInformationPanels={showInformationPanels}
+                            userPlatformFull={userPlatformFull}
+                        />
+                    </div>
+
+                    <!-- Information Panel Stack -->
+                    {#if showInformationPanels}
+                        <div
+                            class="min-w-[30%] flex flex-col items-start justify-start w-full h-full shrink gap-8 pr-16 max-h-full"
+                            id="information-panel-stack"
+                        >
+
+                            <!-- Repo Information Panel -->
+                            <div class="flex-1 min-h-0 w-full">
+                                <RepoInformationPanel
+                                    repo={repoMeta}
+                                    readme={readme}
+                                    topics={topics}
+                                    fetchedURL={fetchedURL}
+                                />
+                            </div>
+
+                            <!-- Release Information Panel -->
+                            {#if assetsByPlatform.length}
+                                <div class="flex-1 min-h-0 w-full">
+                                    <ReleaseInformationPanel  
+                                        release={latestRelease}
+                                    />
+                                </div>
+                            {/if}
+
                         </div>
-                    </span>
-                </button>
+                    {/if}
+
+                </main>
+            {:else if !isFetching}
+                <main
+                    class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-80"
+                    in:fade={{ duration: 3000 }}   
+                    out:fade={{ duration: 500 }}
+                >
+                        
+                    <i class="fa-solid fa-chevron-down text-9xl text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"></i>
+
+                    <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
+                        <div>
+                            Welcome to BlooBarrel.
+                        </div>
+                        <div>
+                            Use the search bar above to fetch releases from a GitHub repository.
+                        </div>
+
+                    </div>
+
+                    <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
+
+                    <!-- Copyable Example -->
+                    <button class="group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4"
+                                    onclick={() => {
+                                navigator.clipboard.writeText('https://github.com/electron/electron/');
+                                console.log("Copied example URL to clipboard!");
+                            }}>
+                        Try an example (click to copy, then paste into the search bar):
+                        <span class="button-flat">
+                            <i class="fa-fw fa-solid fa-link"></i>
+                            <div class="group-hover:underline">
+                                https://github.com/electron/electron/
+                            </div>
+                        </span>
+                    </button>
 
 
-            </main>
-        {/if}
+                </main>
+            {/if}
+        </div>
+
     </div>
-
-</div>
-
+{/if}
 
 
 
@@ -1072,6 +1098,17 @@
     :global(.button-standard) {
         @apply bg-white;
         @apply dark:bg-slate-900;
+    }
+
+
+    :global(.select-element) {
+        @apply bg-white;
+        @apply dark:bg-slate-900;
+        @apply text-blue-400;
+        @apply dark:text-blue-200;
+        @apply rounded-sm;
+        @apply outline-2 outline-offset-2 outline-solid outline-blue-300;
+        @apply hover:cursor-pointer;
     }
 
 </style>
