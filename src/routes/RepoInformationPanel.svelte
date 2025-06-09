@@ -407,7 +407,7 @@
         @apply my-6;
         @apply px-4;
         @apply bg-blue-300;
-        @apply dark:bg-blue-400;
+        @apply dark:bg-slate-700;
         @apply rounded-lg;
         @apply overflow-hidden;
     }
@@ -427,7 +427,7 @@
         @apply pl-4;
         /* @apply even:bg-blue-300; */
         @apply even:bg-[color:color-mix(in_srgb,var(--color-blue-200)_50%,var(--color-blue-300)_50%)];
-        @apply dark:even:bg-[color:color-mix(in_srgb,var(--color-blue-300)_50%,var(--color-blue-400)_50%)];
+        @apply dark:even:bg-slate-600;
         /* @apply even:bg-[color:--bg-col-even]; */
     }
 
