@@ -537,6 +537,18 @@
         console.log("URL Target:", urlTarget);
 
         /*
+            V3 -- Check for full GitHub URL in hash fragment
+            e.g. 'http://localhost:4000/#https://github.com/electron/electron/'
+        */
+        const hashFragment = shareableURL.hash?.replace(/^#/, '');
+        if (hashFragment && hashFragment.startsWith('http')) {
+            console.log("Detected full GitHub URL in hash:", hashFragment);
+            searchPanelText = `${hashFragment}/#BlooBarrel`;
+            fetchFromURL(hashFragment);
+            return;
+        }
+        
+        /*
             V1 -- Check for an entire appended URL
             e.g. 'localhost:4000/releases/https://github.com/electron/electron/releases/'
         */
