@@ -530,23 +530,25 @@
         console.log("Attempting to load shareable URL...");
         console.log("Base: ", base);
         console.log("Page URL:", page.url);
-        // console.log("Base URL:", `${base}/${page.url}`);
 
         //Base HREF
-        //const baseURLhref = `${base}/${page.url.href}`;
-        const urlTarget = `${page.url.href}/${base}`;
+        const urlTarget = `${page.url.href}`;
         const shareableURL = new URL(urlTarget);
+        console.log("URL Target:", urlTarget);
 
         /*
             V1 -- Check for an entire appended URL
             e.g. 'localhost:4000/releases/https://github.com/electron/electron/releases/'
         */
         const pathParts = page.url.pathname.split('/');
-        const lastPart = pathParts[pathParts.length - 1];
+
+        //Get last part (and remove any trailing slashes)
+        const lastPart = pathParts[pathParts.length - 1]
+            .replace(/\/$/, '');
 
         if (lastPart.startsWith('http')) {
             console.log("Detected full GitHub URL in path:", lastPart);
-            searchPanelText = lastPart;
+            searchPanelText = `${lastPart}/#BlooBarrel`;
             fetchFromURL(lastPart);
             return;
         }
@@ -576,7 +578,7 @@
         console.log("GitHub URL:", githubURL);
 
         //Set the search panel text, fetch the releases
-        searchPanelText = githubURL;
+        searchPanelText = `${githubURL}/#BlooBarrel`;
         fetchFromURL(githubURL);
 
     }
