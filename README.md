@@ -5,6 +5,8 @@ BlooBarrel provides a simpler way for people with a lower technical ability to d
 
 Simply provide the link to a repo, and BlooBarrel will recommend the best asset(s) to download for your platform.
 
+![image](https://github.com/user-attachments/assets/547996b3-f84b-4b1d-b13f-66f617d9aa8c)
+
 ---
 ### Basic Site Usage
 
@@ -13,6 +15,9 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 3. Wait a brief moment for any Assets from the latest release to load.
 4. View the *Top Recommended Download* or other compatible Assets in the *All Downloads* list.
 5. Click the Asset you want to start downloading.
+
+![image](https://github.com/user-attachments/assets/2e274f99-b329-48ab-8c47-e7638138434a)
+
 ---
 
 ### Other Functionality
@@ -36,6 +41,8 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 -- A *Release Notes* section which first appears as a large glossy button, and can be fully expanded and viewed by clicking on it.
 -- The number of Assets in the release.
 
+![image](https://github.com/user-attachments/assets/41217db7-2d34-4c78-bc44-fee9d50bdc9c)
+
 ---
 ### Misc. Features
 
@@ -43,6 +50,8 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 - The BlooBarrel repo can be opened by clicking the logo at the top left.
 - Both the small *Instructions* panel and the whole *Search* panel can be hidden.
 - You can jump to a platform's section in the *All Downloads* list by clicking the platform's icon on the left side of the list.
+
+![image](https://github.com/user-attachments/assets/95c50481-bd93-4783-a7c0-22f80c5e87eb)
 
 ---
 ### Notes
