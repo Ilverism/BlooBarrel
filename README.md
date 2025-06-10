@@ -62,6 +62,7 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 
 * Any *Source code* items which normally appear as Assets in GitHub's native release page are not included for download, nor are they counted in the downloadable Assets counter in the *Release Information* panel.
 * If no downloadable Assets are available for a repo, a warning message will be displayed instead; the *Information Panels* toggle will still be made available, but only the *Repository Information* panel will be visible.
+* This site uses GitHub's REST API to make requests to fetch information about GitHub repositories. If you approach 15 requests per hour, you may get a rate limit warning and an indicator of how many requests you have remaining. Please do not attempt to abuse the API in any capacity. For more information about rate limits for the GitHub REST API, you can check their official documentation here: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28.
 
 ---
 ### Credits
