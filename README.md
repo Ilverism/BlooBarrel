@@ -29,17 +29,20 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 ### Information Panels
 - *Information Panels* can be opened after loading a repo by using a toggle switch that appears at the top right.
 - The *Repository Information* panel has the following content:
--- Buttons to open the repo, copy the repo's URL, or open the owner's profile page.
--- The repo's name and 'About' description.
--- A grid of topic badges.
--- A *README* section which first appears as a large glossy button, and can be fully expanded and viewed by clicking on it.
--- The Forks, Watchers, and Stars counts.
+
+  - Buttons to open the repo, copy the repo's URL, or open the owner's profile page.
+  - The repo's name and 'About' description.
+  - A grid of topic badges.
+  - A *README* section which first appears as a large glossy button, and can be fully expanded and viewed by clicking on it.
+  - The Forks, Watchers, and Stars counts.
+
 - The *Release Information* panel has the following content:
--- Buttons to open the release and copy the release's URL.
--- The release's name, publish date, and creation date
--- A grid of labels
--- A *Release Notes* section which first appears as a large glossy button, and can be fully expanded and viewed by clicking on it.
--- The number of Assets in the release.
+
+  - Buttons to open the release and copy the release's URL.
+  - The release's name, publish date, and creation date.
+  - A grid of labels.
+  - A *Release Notes* section which first appears as a large glossy button, and can be fully expanded and viewed by clicking on it.
+  - The number of Assets in the release.
 
 ![image](https://github.com/user-attachments/assets/41217db7-2d34-4c78-bc44-fee9d50bdc9c)
 
