@@ -421,7 +421,8 @@
 
             //Extract 'owner' and 'repo' from the URL
             const URL = urlOverride ?? (document.querySelector('.search-bar') as HTMLInputElement | null)?.value;
-            const regex = /https?:\/\/(?:www\.)?github\.com\/([^\/]+)\/([^\/]+)/;
+            const regex = /^(?:(?:https?:\/\/)?(?:www\.)?github\.com\/)?([^\/\s]+)\/([^\/\s]+)(?:\/.*)?$/;
+
             const match = URL?.match(regex);
 
             //Failed to extract 'owner' and 'repo'
@@ -874,7 +875,7 @@
                             <div class="warning-text text-sm! mb-2">
                                 <i class="fa-fw fa-solid fa-triangle-exclamation mr-2"></i>
                                 <span>
-                                    Low rate limit: {rateLimitRemaining}/{rateLimitMax} remaining. Resets at {rateLimitResetTimeString}.
+                                    Low rate limit: ~{Math.floor(rateLimitRemaining)}/{rateLimitMax} requests remaining. Resets at {rateLimitResetTimeString}.
                                 </span>
                             </div>
                         {/if}
