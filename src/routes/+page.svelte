@@ -1,5 +1,24 @@
+<script module lang="ts">
+
+
+    type FileType = {
+        fullName?: string;  // e.g. 'Executable Installer'
+        extension?: string; // e.g. '.exe'
+        icon: string;       // e.g. 'fa-solid fa-file-exe'
+    }
+
+    import { type GitHub } from '$lib/github';
+
+    export type Asset = GitHub.Asset & {
+        fileType?: FileType;
+        platform: Platform;
+        isRecommended?: boolean;
+    };
+
+</script>
+
 <script lang="ts">
-    
+
     import { fade, fly, scale, slide, blur } from 'svelte/transition';
     import { page } from '$app/state';
     import { Toggle } from "flowbite-svelte";
@@ -41,21 +60,6 @@
     let repoMeta = $state(undefined);
     let readme = $state<string | null>(null);
     let topics = $state<string[]>([]);
-
-    type FileType = {
-        fullName?: string;  // e.g. 'Executable Installer'
-        extension?: string; // e.g. '.exe'
-        icon: string;      // e.g. 'fa-solid fa-file-exe'
-    }
-
-    type Asset = {
-        name: string;
-        fileType?: FileType;
-        platform: Platform;
-        browser_download_url: string;
-        isRecommended?: boolean;
-        download_count?: number;
-    }
 
     const fileTypes: FileType[] = [
         {
@@ -123,7 +127,7 @@
     console.log("User platform:", userPlatform);
     const userPlatformDetected:Platform|null = $state(
         platforms.find((p: { name: string; }) => p.name.toLowerCase().includes(userPlatform??''))
-        ?? 
+        ??
         platforms.find((p: { name: string; }) => p.name === 'Other')
         ?? null
     );
@@ -159,7 +163,7 @@
         console.log("Filtering assets...");
 
         if (!data.releases.length || !userPlatformFull) {
-            
+
             console.warn("No releases found or user platform not set.");
             return [];
 
@@ -183,17 +187,17 @@
 
                  if (matchesExt || matchesPattern)
                     matchedPlatforms.push(platform);
-                
+
             });
 
             const primaryPlatform = matchedPlatforms[0] ?? platforms.find(p => p.name === 'Other');
 
-            const extension = asset.name.includes('.') 
-                ? '.' + asset.name.split('.').pop()?.toLowerCase() 
+            const extension = asset.name.includes('.')
+                ? '.' + asset.name.split('.').pop()?.toLowerCase()
                 : null;
 
-            const fileType: FileType = 
-                fileTypes.find(ft => ft.extension?.toLowerCase() === extension) 
+            const fileType: FileType =
+                fileTypes.find(ft => ft.extension?.toLowerCase() === extension)
                 ?? fileTypes.find(ft => ft.fullName === 'Unknown')!;
 
             console.log("Asset:", asset.name, "Matched platforms:", matchedPlatforms, "Primary platform:", primaryPlatform, "Extension:", extension, "File type:", fileType);
@@ -223,7 +227,7 @@
 
             if (a.fileType?.extension && b.fileType?.extension)
                 return a.fileType?.extension.localeCompare(b.fileType?.extension);
-            
+
             return a.name.localeCompare(b.name);
 
         });
@@ -232,7 +236,7 @@
 
             if (a.fileType?.extension && b.fileType?.extension)
                 return a.fileType?.extension.localeCompare(b.fileType?.extension);
-            
+
             return a.name.localeCompare(b.name);
 
         });
@@ -272,7 +276,7 @@
         let recommendedAssetOut = null;
 
         //Get assets for the detected/target platform
-        const assetsForDetectedPlatform = filteredAssets.filter((asset: Asset) => 
+        const assetsForDetectedPlatform = filteredAssets.filter((asset: Asset) =>
             (asset.platform.name === userPlatformFull?.name)
         );
 
@@ -321,7 +325,7 @@
 
         rateLimitMax        = +res.headers.get('x-ratelimit-limit')! / REQUESTS_PER_FETCH;
         rateLimitRemaining  = +res.headers.get('x-ratelimit-remaining')! / REQUESTS_PER_FETCH;
-        rateLimitResetEpoch = +res.headers.get('x-ratelimit-reset')!;    
+        rateLimitResetEpoch = +res.headers.get('x-ratelimit-reset')!;
 
         rateLimitResetTime = new Date(rateLimitResetEpoch * 1_000); //Convert to milliseconds
         rateLimitResetTimeString = rateLimitResetTime.toLocaleString('en-US', {
@@ -506,7 +510,7 @@
         const shareableURL = new URL(baseURLhref);
         shareableURL.searchParams.set('owner', owner);
         shareableURL.searchParams.set('repo', repo);
-        
+
         console.log("Shareable URL:", shareableURL.href);
 
         //Copy the URL to the clipboard
@@ -547,7 +551,7 @@
             fetchFromURL(hashFragment);
             return;
         }
-        
+
         /*
             V1 -- Check for an entire appended URL
             e.g. 'localhost:4000/releases/https://github.com/electron/electron/releases/'
@@ -585,7 +589,7 @@
             return;
         }
 
-        //Build the GitHub URL 
+        //Build the GitHub URL
         const githubURL = `https://github.com/${owner}/${repo}`;
         console.log("GitHub URL:", githubURL);
 
@@ -604,7 +608,7 @@
     //Theme Toggle
     let darkTheme = localStore('darkTheme', false);
     $effect(() => {
-        
+
         console.log("Toggling dark theme class based on state:", darkTheme.value);
         darkTheme.value = (darkTheme.value ?? false);
 
@@ -659,14 +663,14 @@
                     <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
                     <div class="flex flex-col relative">
                         <span class="text-blue-400 self-center">BlooBarrel</span>
-                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. beta-2025-06.03</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. 2025-06.29</span>
                         <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap not-group-hover:hidden pt-1">
                             <i class="fa-solid fa-fw fa-arrow-up-right-from-square text-blue-400/50"></i>
                             Open in GitHub
                         </span>
                     </div>
                 </a>
-            
+
                 <!-- Header Settings -->
                 <div class="flex flex-row-reverse gap-12">
 
@@ -674,7 +678,7 @@
                     <div class="flex flex-col min-w-48">
 
                         <div class="header-flat">
-                            {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}   
+                            {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}
                         </div>
 
                         <div class="group relative inline-block min-w-48 hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">
@@ -683,7 +687,7 @@
                             <select
                                 bind:value={newUserPlatformName}
                                 onchange={userPlatformSet}
-                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none select-element"      
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none select-element"
                                 aria-label="Platform"
                                 name="platform-select"
                             >
@@ -765,13 +769,13 @@
             <!-- Search Panel -->
             {#if searchPanelOpen}
                 <div class="
-                    grid 
+                    grid
                     grid-cols-[1fr_auto_1fr]
                     items-center
                     gap-4
                     pt-8 pb-10 w-full
                     "
-                    in:slide={{ duration: 200 }}   
+                    in:slide={{ duration: 200 }}
                     out:slide={{ duration: 200 }}
                 >
 
@@ -787,7 +791,7 @@
                                         Instructions
                                     </div>
                                     <i class="mt-2 ml-auto fa-solid fa-fw fa-chevron-right text-sm font-light {displayInstructions?'rotate-90':'rotate-0'} group-hover:scale-115 transition-all duration-200 ease-in-out"></i>
-                                </div>  
+                                </div>
                             </div>
 
                         </button>
@@ -796,7 +800,7 @@
                         {#if displayInstructions}
                             <span out:fade={{ duration: 200 }} in:fade={{ duration: 200 }}>
                                 <ul class="list-disc list-inside text-sm instructions-text max-w-112 space-y-4"
-                                    in:slide={{ duration: 400 }}   
+                                    in:slide={{ duration: 400 }}
                                     out:slide={{ duration: 400 }}
                                 >
                                     <li>
@@ -891,7 +895,7 @@
                                 Copy Shareable Link
                             </div>
                         </button>
-                        
+
                     </div>
 
                 </div>
@@ -926,7 +930,7 @@
 
         <!-- Main Panel Area -->
         <!-- <div class="relative w-full h-full py-8">  -->
-        <div class="relative w-full h-full py-8"> 
+        <div class="relative w-full h-full py-8">
             {#if isFetching}
                 <main
                     class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-64"
@@ -941,10 +945,10 @@
             {:else if performedFirstFetch}
                 <main
                     class="relative flex flex-row w-full h-full min-h-0 shrink items-start justify-center"
-                    in:fade={{ duration: 500, delay: 500 }} 
+                    in:fade={{ duration: 500, delay: 500 }}
                     out:fade={{ duration: 500 }}
                 >
-                        
+
                     <div class="min-w-[70%] w-full min-h-0 h-full px-16">
                         <LatestReleasePanel
                             latestRelease={latestRelease}
@@ -976,7 +980,7 @@
                             <!-- Release Information Panel -->
                             {#if assetsByPlatform.length}
                                 <div class="flex-1 min-h-0 w-full">
-                                    <ReleaseInformationPanel  
+                                    <ReleaseInformationPanel
                                         release={latestRelease}
                                     />
                                 </div>
@@ -989,10 +993,10 @@
             {:else if !isFetching}
                 <main
                     class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-80"
-                    in:fade={{ duration: 3000 }}   
+                    in:fade={{ duration: 3000 }}
                     out:fade={{ duration: 500 }}
                 >
-                        
+
                     <i class="fa-solid fa-chevron-down text-9xl text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"></i>
 
                     <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
@@ -1040,7 +1044,7 @@
     @plugin 'tailwind-scrollbar';
 
     .search-bar {
-        
+
         @apply min-w-[50%];
         @apply min-h-12;
         @apply bg-white;
@@ -1049,7 +1053,7 @@
         @apply dark:text-blue-200;
         @apply rounded-sm;
         @apply outline-3 outline-offset-2 outline-solid outline-blue-300;
-        
+
     }
 
 

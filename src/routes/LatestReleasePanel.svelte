@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onDestroy, onMount } from 'svelte';
-
     
     import PlatformButton from './PlatformButton.svelte';
     import type { Platform } from './releases/Platform';
+
+    import { type Asset } from './+page.svelte';
     
     let {
         latestRelease,
@@ -52,7 +53,7 @@
 
     type AssetGroup ={
         platform: Platform;
-        assets: any[];
+        assets: Asset[];
         isRecommended: boolean;
     }
 
@@ -200,7 +201,13 @@
 
         //In each group, sort assets by extension (alphabetical order)
         for (const group of assetGroupsOut) {
-            group.assets.sort((a, b) => a.extension.localeCompare(b.extension));
+
+            group.assets.sort((a, b) => {
+                const extA = a.fileType?.extension ?? '';
+                const extB = b.fileType?.extension ?? '';
+                return extA.localeCompare(extB);
+            });
+            
         }
 
         //Then, in each group, sort assets by size (descending order)
