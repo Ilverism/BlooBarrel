@@ -29,7 +29,7 @@
 
     const SUBTITLE_MESSAGE_NOSEARCH = "No search performed yet. Please wait for the latest release to be fetched.";
     const SUBTITLE_MESSAGE_FAILURE = "Failed to fetch any downloadable assets from the latest release.\nPlease try a different repository check your connection.";
-    const SUBTITLE_MESSAGE_SUCCESS = "Click on a button below to download an asset.";
+    const SUBTITLE_MESSAGE_SUCCESS = `${''/*[Tap|Click]*/} on a button below to download an asset.`;
     let subtitleMessage = $derived.by(() => {
 
         //Haven't performed a search yet...
@@ -95,6 +95,19 @@
 
     }
 
+    function setMobilePlatformSelected(fullName: string|null) {
+
+        /*
+            Sets the selected platform for mobile view.
+        */
+
+        assetPlatformCurrentNameTarget = fullName?.toLowerCase() ?? null;
+        assetPlatformCurrentName = fullName?.toLowerCase() ?? null;
+
+        console.log("Mobile Platform Selected: ", fullName);
+
+    }
+
     let assetPlatforms = $derived.by(() => {
 
         let platformsOut: Platform[] = [];
@@ -111,7 +124,6 @@
         }
 
         //Sort platforms by name
-        //platformsOut.sort((a, b) => a.name.localeCompare(b.name));
         return platformsOut;
 
     });
@@ -325,7 +337,11 @@
 <div class="flex flex-col flex-1 items-center justify-center w-full min-h-0 h-full">
 
     <!-- Latest Release Header -->
-    <div class="flex flex-col mr-auto">
+    <div class="
+        px-4
+        md:px-0
+        flex flex-col mr-auto
+    ">
 
         <div class="w-full">
             <div class="header-large-flat">
@@ -338,11 +354,28 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 Warning
             </div>
-            <div class="text-3xl italic message-text font-light whitespace-pre">
+            <div class="
+                md:whitespace-pre
+                text-3xl italic message-text font-light
+            ">
+                {subtitleMessage}
+            </div>
+        {:else if subtitleMessage===SUBTITLE_MESSAGE_SUCCESS}
+            <div class="
+                before:content-['Tap']
+                md:before:content-['Click']
+                text-2xl mt-2 whitespace-normal break-words
+                md:text-3xl md:mt-4 md:whitespace-pre
+                italic message-text font-light
+            ">
                 {subtitleMessage}
             </div>
         {:else}
-            <div class="text-3xl italic message-text font-light whitespace-pre mt-4">
+            <div class="
+                text-2xl mt-2 whitespace-normal break-words
+                md:text-3xl md:mt-4 md:whitespace-pre
+                italic message-text font-light
+            ">
                 {subtitleMessage}
             </div>
         {/if}
@@ -353,57 +386,103 @@
     {#if assetsByPlatform.length}
 
         <!-- <div class="relative mt-12 flex flex-row items-center justify-start gap-4 w-full h-full grow bg-blue-50"> -->
-        <div class="relative mt-12 flex flex-row items-center justify-start gap-4 w-full h-full latest-release-panel-bg">
+        <div class="
+            flex-col
+            md:flex-row
+            relative mt-12 flex items-center justify-start gap-4 w-full h-full latest-release-panel-bg
+        ">
 
             <!-- Release Information Area -->
-            <div class="absolute left-0 top-0 flex flex-row items-start justify-center ml-8 mt-4 gap-4 w-full">
+            <div class="
+                mt-4
+                md:absolute md:ml-8
+                left-0 top-0 flex flex-row items-start justify-center gap-4 w-full
+            ">
 
                 <!-- Key -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text">
+                <div class="
+                    flex-col mx-4
+                    md:flex-row md:mx-0
+                    flex justify-start gap-8 w-full
+                ">
 
-                    <div class="header-flat w-full">
-                        Key
-                    </div>
 
-                    <!-- Light Blue Circle -->
-                    <div class="flex flex-row items-center gap-2 w-full">
-                        <div class="w-2 h-2 aspect-square rounded-full downloadable-asset"></div>
-                        <div class="text-sm">Downloadable Assets</div>
-                    </div>
+                    <!-- Key Area -->
+                    <div class="
+                        w-full
+                        md:w-fit
+                        flex flex-col items-start justify-center gap-2 message-text
+                    ">
 
-                    <!-- Dark Blue Circle -->
-                    <div class="flex flex-row items-center gap-2">
-                        <div class="w-2 h-2 aspect-square rounded-full recommended-asset"></div>
-                        <div class="text-sm">Recommended Downloads</div>
-                    </div>
-
-                </div>
-
-                <!-- Release Info -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 message-text mr-auto">
-
-                    <div class="header-flat flex! flex-row! items-center gap-4">
-                        <div class="whitespace-nowrap">
-                            Release Information
+                        <div class="header-flat w-full">
+                            Key
                         </div>
+                       
+                        <div class="
+                            flex-row text-xs
+                            md:flex-col md:text-sm
+                            flex gap-2 w-full
+                        ">
+                            <!-- Light Blue Circle -->
+                            <div class="flex flex-row items-center gap-2 w-full">
+                                <div class="w-2 h-2 aspect-square rounded-full downloadable-asset"></div>
+                                <div class="whitespace-nowrap w-full text-nowrap">Downloadable Assets</div>
+                            </div>
+
+                            <!-- Dark Blue Circle -->
+                            <div class="flex flex-row items-center gap-2">
+                                <div class="w-2 h-2 aspect-square rounded-full recommended-asset"></div>
+                                <div class="whitespace-nowrap w-full text-nowrap">Recommended Downloads</div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <!-- Name -->
-                    <div class="flex flex-row items-center gap-2 w-full">
-                        <i class="fa-fw fa-solid fa-pencil opacity-50"></i>
-                        <div class="text-sm">{latestRelease.name ?? "Unknown Name"}</div>
-                    </div>
+                    <!-- Release Info -->
+                    <div class="
+                        w-full
+                        md:w-fit
+                        flex flex-col items-start justify-center gap-2 message-text mr-auto
+                    ">
 
-                    <!-- Date -->
-                    <div class="flex flex-row items-center gap-2 w-full">
-                        <i class="fa-fw fa-solid fa-calendar opacity-50"></i>
-                        <div class="text-sm">{releaseDateYMD}</div>
-                    </div>
+                        <div class="
+                            w-full
+                            header-flat flex! flex-row! items-center gap-4
+                        ">
+                            <div class="whitespace-nowrap">
+                                Release Information
+                            </div>
+                        </div>
 
+                        <div class="
+                            flex-row text-xs
+                            md:flex-col md:text-sm
+                            flex gap-2 w-full
+                        ">
+
+                            <!-- Name -->
+                            <div class="flex flex-row items-center gap-2 w-full">
+                                <i class="fa-fw fa-solid fa-pencil opacity-50"></i>
+                                <div class="whitespace-nowrap w-full text-nowrap">{latestRelease.name ?? "Unknown Name"}</div>
+                            </div>
+
+                            <!-- Date -->
+                            <div class="flex flex-row items-center gap-2 w-full">
+                                <i class="fa-fw fa-solid fa-calendar opacity-50"></i>
+                                <div class="whitespace-nowrap w-full text-nowrap">{releaseDateYMD}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
 
-                <!-- Toggle Sorting -->
-                <div class="flex flex-col items-start justify-center w-fit gap-2 text-slate-500 ml-auto mr-16">
+                <!-- Toggle Sorting (Desktop) -->
+                <div class="
+                    hidden!
+                    md:flex!
+                    flex-col items-start justify-center w-fit gap-2 text-slate-500 ml-auto mr-16 whitespace-nowrap
+                ">
 
                     <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-100">
 
@@ -426,52 +505,102 @@
             <!-- Recommended Asset -->
             {#if assetTopRecommended}
 
-                <div class="recommended-asset-container max-w-[20%] min-w-[20%] max-h-[5%] aspect-square mt-16">
+                <div class="
+                    w-full
+                    md:max-w-[20%] md:min-w-[20%] md:max-h-[5%] md:aspect-square
+                    recommended-asset-container  my-20
+                ">
 
-                    <div class="header-flat flex! flex-row! items-center gap-4 ml-12 h-full">
+                    <div class="
+                        h-fit
+                        md:ml-12 md:h-full
+                        header-flat flex! flex-row! items-center gap-4
+                    ">
                         <i class="fa-solid fa-cloud-arrow-down opacity-50"></i>
-                        <div class="font-bold whitespace-nowrap text-xl">
+                        <div class="
+                            text-base
+                            md:text-xl
+                            font-bold whitespace-nowrap
+                        ">
                             Top Recommended Download
                         </div>
                     </div>
 
-                    <div class="w-96 min-h-64 mt-4 ml-4 self-center">
+                    <div class="
+                        w-full px-4 aspect-video
+                        md:w-96 md:min-h-64 md:ml-4 md:px-0 md:aspect-auto
+                        mt-4 self-center
+                    ">
                         <PlatformButton asset={assetTopRecommended} isRecommended isTopRecommended/>
                     </div>
                 </div>
                     
             {/if}
 
-            <!-- Asset Grid/List -->
-            <div class="grow flex flex-col items-center self-center pr-8 absolute top-1/2 right-0 -translate-x-1 -translate-y-1/2 w-full max-w-[60%] min-h-3/5 h-7/8 max-h-full"> 
+            <!-- Asset List -->
+            <div class="
+                w-full
+                md:absolute md:max-w-[60%] md:min-h-3/5 md:pr-8 md:-translate-x-1 md:-translate-y-1/2 md:h-7/8
+                grow flex flex-col items-center self-center top-1/2 right-0 max-h-full
+            "> 
 
-                <div class="header-flat">
-                    All Downloads
+                <div class="
+                    before:content-['Platform']
+                    md:before:content-['All_Downloads']
+                    header-flat
+                ">
                 </div>
 
                 <!-- Platform Scroll Buttons -->
                 {#if assetPlatforms.length > 1}
-                    <div class="absolute flex flex-col gap-4 left-[0] -ml-12 top-1/2 -translate-y-1/2 w-fit h-fit">
+                    <div class="
+                        flex-row justify-between items-center my-4
+                        md:absolute md:-translate-y-1/2 md:-ml-12 md:my-0 md:flex-col
+                        flex gap-4 left-0 top-1/2  w-fit h-fit
+                    ">
                         
                         {#each assetPlatforms as platform}
 
                             {@const isCurrentPlatform = (platform.name.toLowerCase() === (assetPlatformCurrentNameTarget===null?assetPlatformCurrentName.toLowerCase():assetPlatformCurrentNameTarget.toLowerCase()))}
 
+                            <!-- Platform Scroll Button (Desktop) -->
                             <button
-                                class="button-flat group text-lg ml-16 flex flex-row items-center asset-platform-button {isCurrentPlatform?'asset-platform-button-current':''}"
+                                class="
+                                    hidden!
+                                    md:flex!
+                                    md:ml-16
+                                    button-flat group text-lg flex-row items-center asset-platform-button {isCurrentPlatform?'asset-platform-button-current':''}
+                                "
                                 aria-label="Scroll to {platform.name} assets"
                                 onclick={() => scrollToPlatform(platform.name)}
                             >
                                 <i class="group-hover:underline underline-offset-auto fa-fw {platform.icon}"></i>
                             </button>
+
+                            <!-- Platform Select Button (Mobile) -->
+                            <button
+                                class="
+                                    flex!
+                                    md:hidden!
+                                    md:ml-16
+                                    button-flat group text-lg flex-row items-center asset-platform-button {isCurrentPlatform?'asset-platform-button-current':''}
+                                "
+                                aria-label="Select {platform.name} assets"
+                                onclick={() => setMobilePlatformSelected(platform.name)}
+                            >
+                                <i class="group-hover:underline underline-offset-auto fa-fw {platform.icon}"></i>
+                            </button>
+
                         {/each}
 
                     </div>
                 {/if}
 
-                <!-- Assets Per Platform List -->
+                <!-- Assets Per Platform List (Desktop) -->
                 <div class="
-                    w-full mt-4 overflow-y-scroll overflow-x-clip  pr-8 flex flex-col gap-4
+                    hidden!
+                    md:flex! md:pr-8
+                    w-full mt-4 overflow-y-scroll overflow-x-clip flex-col gap-4
                     assets-scrollbar
                     "
                     bind:this={listEl}
@@ -483,18 +612,29 @@
                         {@const isRecommendedGroup = sortedAssetGroup.isRecommended}
 
                         <div
-                            class="header-flat text-lg ml-16 flex flex-row items-center"
+                            class="
+                                ml-16
+                                header-flat text-lg flex! flex-row! items-center justify-between
+                            "
                             data-platform={sortedAssetGroup.platform.name.toLowerCase()}
-                        >
-                            <i class="fa-fw {sortedAssetGroup.platform.icon}"></i>
-                            {sortedAssetGroup.platform.name}
+                        >   
+
+                            <!-- Platform Name & Icon -->
+                            <div>
+                                <i class="fa-fw {sortedAssetGroup.platform.icon}"></i>
+                                {sortedAssetGroup.platform.name}
+                            </div>
+
                         </div>
 
-                        <div class="flex flex-col items-center justify-start gap-3 w-full mb-4 ml-8">
+                        <div class="
+                            ml-8
+                            flex flex-col items-center justify-start gap-3 w-full mb-4
+                        ">
 
                             {#each sortedAssetGroup.assets as asset}
 
-                                <div class="w-full h-fit ml-16 pr-16">
+                                <div class="ml-16 pr-16 w-full h-fit">
                                     <PlatformButton asset={asset} isRecommended={isRecommendedGroup} listMode/>
                                 </div>
 
@@ -504,6 +644,80 @@
 
                     {/each}
 
+                </div>
+
+                <!-- Assets Per Platform List (Mobile) -- Only display the current platform. No 'listEl' binding needed either.  -->
+                <div class="
+                    md:hidden!
+                    w-full mt-4 overflow-y-scroll overflow-x-clip flex-col gap-4
+                    "
+                >
+                    {#each assetsPerPlatform as assetGroup}
+
+                        {@const sortedAssetGroup = assetGroupSort(assetGroup)}
+                        {@const isRecommendedGroup = sortedAssetGroup.isRecommended}
+
+                        {#if sortedAssetGroup.platform.name.toLowerCase() === (assetPlatformCurrentNameTarget===null?assetPlatformCurrentName.toLowerCase():assetPlatformCurrentNameTarget.toLowerCase())}
+
+                            <div
+                                class="
+                                    mx-4 max-w-[90%]
+                                    header-flat text-lg flex! flex-row! items-center justify-between
+                                    mb-4!
+                                "
+                                data-platform={sortedAssetGroup.platform.name.toLowerCase()}
+                            >   
+
+                                <!-- Platform Name & Icon -->
+                                <div>
+                                    <i class="fa-fw {sortedAssetGroup.platform.icon}"></i>
+                                    {sortedAssetGroup.platform.name}
+                                </div>
+
+                                <!-- Toggle Sorting (Phone) -->
+                                <div class="
+                                    mt-auto
+                                    flex
+                                    md:hidden!
+                                    flex-col items-start justify-center w-fit gap-2 text-slate-500 text-xs
+                                ">
+
+                                    <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-100">
+
+                                        <!-- Toggle Sort Mode -->
+                                        <button
+                                            class="button-flat group"
+                                            onclick={cycleAssetGroupSortType}
+                                            aria-label="Toggle View"
+                                        >
+                                            <i class="fa-fw fa-solid fa-sort"></i>
+                                            <div class="group-hover:underline">
+                                                <b class="capitalize">{assetGroupSortType}</b>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="
+                                px-4
+                                flex flex-col items-center justify-start gap-3 w-full mb-4
+                            ">
+
+                                {#each sortedAssetGroup.assets as asset}
+
+                                    <div class="w-full h-fit">
+                                        <PlatformButton asset={asset} isRecommended={isRecommendedGroup} listMode/>
+                                    </div>
+
+                                {/each}
+
+                            </div>
+
+                        {/if}
+
+                    {/each}
                 </div>
 
             </div>
@@ -534,14 +748,17 @@
         @apply dark:bg-blue-300;
     }
 
-    .recommended-asset-container {
+    /* .recommended-asset-container {
         @apply flex flex-col;
-        @apply items-center justify-center;
-        @apply mx-24;
-    }
+        @apply justify-start;
+        @apply items-center md:justify-center;
+        @apply md:mx-24;
+    } */
 
     .recommended-asset-container {
-        @apply flex flex-col items-center justify-center mx-24;
+        @apply justify-start;
+        @apply flex flex-col items-center md:justify-center;
+        @apply md:mx-24;
     }
 
     .latest-release-panel-bg {

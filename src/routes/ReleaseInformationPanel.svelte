@@ -201,7 +201,11 @@
             {@const readmeHTML = markdownConverter.makeHtml(body)}
 
             <button
-                class="group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg"
+                class="
+                    max-h-96
+                    md:max-h-fit
+                    group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg
+                "
                 onclick={openNotes}
             >
                 <div class="pointer-events-none mask-b-from-20% markdown-body p-4 w-full h-full top-0 left-0 text-slate-700 rounded-lg">

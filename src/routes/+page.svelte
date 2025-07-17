@@ -35,6 +35,7 @@
     import LatestReleasePanel from './LatestReleasePanel.svelte';
     import RepoInformationPanel from './RepoInformationPanel.svelte';
     import ReleaseInformationPanel from './ReleaseInformationPanel.svelte';
+    import { browser } from '$app/environment';
 
 
     const os = navigator.userAgent;
@@ -399,10 +400,26 @@
     });
 
 
+    let displayInstructions = $state(true);
+    onMount(() => {
+
+
+        /*
+            Hide display instructions by default
+            on smaller devices.
+        */
+
+        if (!browser)
+            return;
+
+        const mq = window.matchMedia('(min-width: 768px)');
+        displayInstructions = mq.matches;
+
+    });
+
     let isFetching = $state(false);
     let fetchedURL:string|null = $state(null);
     let performedFirstFetch = $state(false);
-    let displayInstructions = $state(true);
     async function fetchFromURL(urlOverride: string|null=null) {
 
         /*
@@ -652,11 +669,19 @@
         <div class="top-0 z-10 bg-base-100 header-area" id="page-header">
 
             <!-- Header -->
-            <div class="flex flex-row items-center justify-between py-4 px-8 shadow-md z-20 relative">
+            <div class="
+                px-4
+                md:px-8
+                flex flex-row items-center justify-between py-4 shadow-md z-20 relative
+            ">
 
                 <!-- Logo & Title -->
                 <a
-                    class="hover:scale-105 hover:cursor-pointer group ml-16 mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2"
+                    class="
+                        ml-0
+                        md:ml-16
+                        hover:scale-105 hover:cursor-pointer group mb-4 flex flex-row text-2xl font-bold text-blue-400 select-none items-center justify-center gap-2
+                    "
                     aria-label="Open BlooBarrel in GitHub"
                     target="_blank"
                     href="https://github.com/Ilverism/BlooBarrel"
@@ -664,7 +689,7 @@
                     <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
                     <div class="flex flex-col relative">
                         <span class="text-blue-400 self-center">BlooBarrel</span>
-                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. 2025-06.29</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. 2025-07.16</span>
                         <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap not-group-hover:hidden pt-1">
                             <i class="fa-solid fa-fw fa-arrow-up-right-from-square text-blue-400/50"></i>
                             Open in GitHub
@@ -673,16 +698,26 @@
                 </a>
 
                 <!-- Header Settings -->
-                <div class="flex flex-row-reverse gap-12">
+                <div class="
+                    flex-col-reverse
+                    md:flex-row-reverse md:gap-12
+                    flex 
+                ">
 
                     <!-- Detected Platform -->
-                    <div class="flex flex-col min-w-48">
+                    <div class="
+                        flex flex-col header-button-row-size
+                    ">
 
-                        <div class="header-flat">
+                        <div class="
+                            hidden!
+                            md:block!
+                            header-flat"
+                        >
                             {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}
                         </div>
 
-                        <div class="group relative inline-block min-w-48 hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">
+                        <div class="group relative inline-block header-button-row-size hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">
 
                             <!-- The real select, stretched over the whole area but invisible -->
                             <select
@@ -712,46 +747,67 @@
                     </div>
 
                     <!-- Theme Toggle -->
-                    <div class="flex flex-col min-w-48">
+                    <div class="
+                        gap-4
+                        md:gap-12
+                        flex flex-row-reverse
+                    ">
+                        <div class="
+                            header-button-row-size
+                            flex flex-col
+                        ">
 
-                        <div class="header-flat">
-                            Toggle Theme
-                        </div>
-
-                        <!-- Toggle Switch -->
-                        <div class="flex flex-row">
-                            <Toggle
-                                bind:checked={darkTheme.value}
-                                color="blue"
-                                class="py-1 hover:cursor-pointer"
-                                aria-label="Toggle Page Theme"
-                            >
-                            </Toggle>
-
-
-                            <i class="fa-solid fa-fw {darkTheme.value?'fa-moon':'fa-sun'} message-text py-1 scale-125 self-center"></i>
-                        </div>
-                    </div>
-
-                    <!-- Information Panel Toggle -->
-                    {#if performedFirstFetch}
-                        <div class="flex flex-col min-w-48" in:fade={{duration: 800}}>
-
-                            <div class="header-flat">
-                                Information Panels
+                            <div class="
+                                hidden!
+                                md:block!
+                                header-flat
+                            ">
+                                Toggle Theme
                             </div>
 
                             <!-- Toggle Switch -->
-                            <Toggle
-                                bind:checked={showInformationPanels}
-                                color="blue"
-                                class="py-1 hover:cursor-pointer w-fit"
-                                aria-label="Toggle Information Panels"
-                            >
-                            </Toggle>
+                            <div class="flex flex-row my-auto md:my-0">
+                                <Toggle
+                                    bind:checked={darkTheme.value}
+                                    color="blue"
+                                    class="py-1 hover:cursor-pointer"
+                                    aria-label="Toggle Page Theme"
+                                >
+                                </Toggle>
 
+
+                                <i class="fa-solid fa-fw {darkTheme.value?'fa-moon':'fa-sun'} message-text py-1 scale-125 self-center"></i>
+                            </div>
                         </div>
-                    {/if}
+
+                        <!-- Information Panel Toggle -->
+                        {#if performedFirstFetch}
+                            <div class="flex flex-col header-button-row-size" in:fade={{duration: 800}}>
+
+                                <div class="
+                                    hidden!
+                                    md:block!
+                                    header-flat
+                                ">
+                                    Information Panels
+                                </div>
+
+                                <!-- Toggle Switch -->
+                                <div class="flex flex-row my-auto md:my-0">
+                                    <Toggle
+                                        bind:checked={showInformationPanels}
+                                        color="blue"
+                                        class="py-1 hover:cursor-pointer w-fit"
+                                        aria-label="Toggle Information Panels"
+                                    >
+                                    </Toggle>
+
+                                    <i class="fa-solid fa-fw fa-circle-info message-text py-1 scale-125 self-center"></i>
+                                </div>
+
+                            </div>
+                        {/if}
+                    </div>
 
                 </div>
 
@@ -770,8 +826,8 @@
             <!-- Search Panel -->
             {#if searchPanelOpen}
                 <div class="
-                    grid
-                    grid-cols-[1fr_auto_1fr]
+                    flex flex-col
+                    md:grid md:grid-cols-[1fr_auto_1fr]
                     items-center
                     gap-4
                     pt-8 pb-10 w-full
@@ -781,7 +837,11 @@
                 >
 
                     <!-- Instructions Div -->
-                    <div class="flex flex-col mx-auto min-w-114 max-w-[67%] justify-self-start">
+                    <div class="
+                        w-[80%]
+                        md:min-w-114 md:max-w-[67%]
+                        flex flex-col mx-auto   justify-self-start
+                        ">
 
                         <button class="w-full group hover:cursor-pointer mb-4" onclick={() => displayInstructions = !displayInstructions} aria-label="Toggle Instructions">
 
@@ -826,7 +886,11 @@
                     </div>
 
                     <!-- Search Input Area -->
-                    <div class="justify-self-center flex flex-col gap-4 w-3xl mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%] my-2">
+                    <div class="
+                        w-[80%] my-8
+                        md:w-3xl md:my-2
+                        justify-self-center flex flex-col gap-4 mx-auto items-start search-panel max-w-[100%] lg:max-w-[75%]
+                    ">
 
                         <!-- Search Bar Header -->
                         <div class="w-full">
@@ -843,12 +907,31 @@
                                 bind:value={searchPanelText}
                                 name="search-bar"
                                 type="text"
-                                placeholder="Paste a GitHub link (e.g. https://github.com/owner/project)"
-                                class="input input-bordered min-w-full search-bar px-4 flex-1"
+                                placeholder="Paste a GitHub link"
+                                class="
+                                    md:hidden
+                                    input input-bordered min-w-full search-bar px-4 flex-1
+                                "
                             />
+                            <input
+                                bind:value={searchPanelText}
+                                name="search-bar"
+                                type="text"
+                                placeholder="Paste a GitHub link (e.g. https://github.com/owner/project)"
+                                class="
+                                    hidden
+                                    md:block
+                                    input input-bordered min-w-full search-bar px-4 flex-1
+                                "
+                                />
 
                             <!-- Submit Button -->
-                            <div class="flex items-center ml-12 min-w-16 min-h-16">
+                            <div class="
+                                ml-4
+                                w-12 h-12
+                                md:ml-12 md:min-w-16 md:min-h-16
+                                flex items-center
+                            ">
 
                                 <!-- Fetching, show loading circle -->
                                 {#if isFetching}
@@ -858,7 +941,11 @@
                                 {:else}
                                     <button
                                         disabled={!searchPanelText}
-                                        class="group disabled:opacity-50 flex items-center min-w-16 min-h-16 justify-center button-standard rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none"
+                                        class="
+                                            w-12 h-12
+                                            md:min-w-16 md:min-h-16
+                                            group disabled:opacity-50 flex items-center justify-center button-standard rounded-sm scale-100 hover:scale-105 hover:cursor-pointer outline-2 outline-offset-2 outline-solid outline-blue-300 disabled:outline-gray-300 disabled:pointer-events-none
+                                        "
                                         onclick={() => fetchFromURL()}
                                         aria-label="Fetch Releases"
                                     >
@@ -906,6 +993,8 @@
             <button
                 onclick={searchPanelToggle}
                 class="
+                    hidden!
+                    md:block!
                     group absolute left-1/2 bottom-0            /* anchor: bottom-centre of header */
                     -translate-x-1/2  translate-y-1/2           /* shove left 50 %, down 50 %   */
                     w-16 h-16 rounded-full button-standard shadow-lg
@@ -945,12 +1034,20 @@
                 </main>
             {:else if performedFirstFetch}
                 <main
-                    class="relative flex flex-row w-full h-full min-h-0 shrink items-start justify-center"
+                    class="
+                        flex-col
+                        md:flex-row
+                        relative flex w-full h-full min-h-0 shrink items-start justify-center
+                    "
                     in:fade={{ duration: 500, delay: 500 }}
                     out:fade={{ duration: 500 }}
                 >
 
-                    <div class="min-w-[70%] w-full min-h-0 h-full px-16">
+                    <div class="
+                        px-4
+                        md:px-16
+                        min-w-[70%] w-full min-h-0 h-full
+                    ">
                         <LatestReleasePanel
                             latestRelease={latestRelease}
                             assetsByPlatform={assetsByPlatform}
@@ -964,7 +1061,11 @@
                     <!-- Information Panel Stack -->
                     {#if showInformationPanels}
                         <div
-                            class="min-w-[30%] flex flex-col items-start justify-start w-full h-full shrink gap-8 pr-16 max-h-full"
+                            class="
+                                px-4 pt-6
+                                md:pr-16 md:pt-0 md:h-full
+                                min-w-[30%] flex flex-col items-start justify-start w-full h-full shrink gap-8 max-h-full
+                            "
                             id="information-panel-stack"
                         >
 
@@ -993,18 +1094,30 @@
                 </main>
             {:else if !isFetching}
                 <main
-                    class="relative flex z-20 flex-col items-center justify-center w-full h-full pb-80"
+                    class="
+                        w-[80%] mx-auto
+                        md:w-full md:mx-0
+                        relative flex z-20 flex-col items-center justify-center h-full pb-80
+                    "
                     in:fade={{ duration: 3000 }}
                     out:fade={{ duration: 500 }}
                 >
 
-                    <i class="fa-solid fa-chevron-down text-9xl text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"></i>
+                    <i class="
+                        text-5xl
+                        md:text-9xl
+                        fa-solid fa-chevron-down text-neutral-700 animate-bounce mb-24 [animation-duration:2.0s] rotate-180"
+                    ></i>
 
-                    <div class="text-3xl italic message-text font-light whitespace-pre flex flex-col items-center justify-center gap-4">
+                    <div class="
+                        text-center
+                        md:whitespace-pre
+                        text-3xl italic message-text font-light flex flex-col items-center justify-center gap-4
+                        ">
                         <div>
                             Welcome to <b>BlooBarrel</b>: GitHub downloads made simple!
                         </div>
-                        <div>
+                        <div class="text-xl md:text-3xl">
                             Use the search bar above to get downloads from a GitHub repository.
                         </div>
 
@@ -1013,13 +1126,30 @@
                     <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
 
                     <!-- Copyable Example -->
-                    <button class="group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4"
-                                    onclick={() => {
-                                navigator.clipboard.writeText('https://github.com/electron/electron/');
-                                console.log("Copied example URL to clipboard!");
-                            }}>
-                        Try an example (click to copy, then paste into the search bar):
-                        <span class="button-flat">
+                    <button class="
+                        w-full
+                        group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4
+                        "
+                        onclick={() => {
+                        navigator.clipboard.writeText('https://github.com/electron/electron/');
+                        console.log("Copied example URL to clipboard!");
+                    }}>
+                        <div class="
+                            md:hidden!
+                            w-full text-center text-2xl whitespace-normal!
+                            ">Try an example (tap to copy, then paste into the search bar):</div>
+
+                        <div class="
+                            hidden
+                            md:block
+                            wrap-break-word text-center
+                            ">Try an example (click to copy, then paste into the search bar):</div>
+
+                        <span class="
+                            scale-75
+                            md:scale-100
+                            button-flat
+                        ">
                             <i class="fa-fw fa-solid fa-link"></i>
                             <div class="group-hover:underline">
                                 https://github.com/electron/electron/
@@ -1057,6 +1187,9 @@
 
     }
 
+    .header-button-row-size {
+        @apply md:min-w-48;
+    }
 
     :global(.message-text) {
         @apply text-slate-500;
@@ -1066,7 +1199,8 @@
     :global(html, body) {
         @apply overflow-x-hidden;
         /* @apply overflow-y-scroll; */
-        @apply h-full;
+        @apply h-fit;
+        @apply md:h-full;
         @apply dark:scheme-dark;
     }
 
@@ -1075,7 +1209,8 @@
         @apply bg-gradient-to-r;
         @apply from-white via-40% via-white to-zinc-100;
         @apply dark:from-zinc-900 via-40% dark:via-zinc-900 dark:to-neutral-900;
-        @apply m-0 flex flex-col min-h-screen;
+        @apply min-h-fit;
+        @apply m-0 flex flex-col md:min-h-screen;
     }
 
     :global(.header-flat) {
@@ -1089,7 +1224,8 @@
     }
 
     :global(.header-large-flat) {
-        @apply text-7xl font-normal;
+        @apply text-5xl;
+        @apply md:text-7xl font-normal;
         @apply text-neutral-700;
         @apply dark:text-neutral-100;
         @apply inline-block border-b border-slate-400/50 pb-1.75 mb-1.75;

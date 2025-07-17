@@ -223,7 +223,11 @@
 
 
             <button
-                class="group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg "
+                class="
+                    max-h-96
+                    md:max-h-fit
+                    group relative text-left readme-button flex shrink min-h-0 w-full overflow-y-clip bg-transparent opacity-50 hover:opacity-75 hover:cursor-pointer rounded-lg
+                "
                 onclick={openReadme}
             >
                 <div class="pointer-events-none mask-b-from-20% markdown-body p-4 w-full h-full top-0 left-0 text-slate-700 rounded-lg">
@@ -343,7 +347,10 @@
         @apply flex flex-row items-center justify-between;
         @apply self-center;
         @apply w-full;
-        @apply px-4 my-4;
+        @apply px-0;
+        @apply md:px-4 my-4;
+        @apply text-xs;
+        @apply md:text-inherit;
         @apply lg:text-xs lg:my-2;
     }
 
