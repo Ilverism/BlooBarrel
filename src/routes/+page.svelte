@@ -25,6 +25,7 @@
     import { base } from '$app/paths';
     import type { Platform } from './releases/Platform';
     import { localStore } from '$lib/localStore.svelte';
+    import Bowser from 'bowser';
 
     let data:any = $state({
         releases: [],
@@ -37,35 +38,6 @@
     import ReleaseInformationPanel from './ReleaseInformationPanel.svelte';
     import { browser } from '$app/environment';
 
-
-    const os = navigator.userAgent;
-    const userPlatform =
-            /Win/.test(os) ? 'win'
-        :   /Mac/.test(os) ? 'mac'
-        :   /Linux/.test(os) ? 'linux'
-        :   /Android/.test(os) ? 'android'
-        :   /iOS/.test(os) ? 'ios'
-        :   /Web/.test(os) ? 'web'
-        : null;
-
-
-    let copiedExample = $state(false);
-
-    let searchPanelText = $state("");
-    let searchPanelOpen = $state(true);
-    function searchPanelToggle() {
-
-        searchPanelOpen = !searchPanelOpen;
-        console.log("Search panel toggled to new state: ", searchPanelOpen);
-
-    }
-
-    let owner = $state('');
-    let repo = $state('');
-
-    let repoMeta = $state(undefined);
-    let readme = $state<string | null>(null);
-    let topics = $state<string[]>([]);
 
     const fileTypes: FileType[] = [
         {
@@ -130,14 +102,58 @@
 
 
 
-    console.log("User platform:", userPlatform);
-    const userPlatformDetected:Platform|null = $state(
-        platforms.find((p: { name: string; }) => p.name.toLowerCase().includes(userPlatform??''))
-        ??
-        platforms.find((p: { name: string; }) => p.name === 'Other')
-        ?? null
-    );
-    let userPlatformFull:Platform|null = $state(userPlatformDetected);
+    //New Platform Detection using Bowser
+    let userPlatformDetected = $state("");
+
+    if (browser) {
+
+        try {
+            userPlatformDetected = Bowser
+            .getParser(navigator.userAgent)
+            .getOSName(true);
+        } catch {
+            /* ignore */
+        }
+
+    }
+
+    const OS_TO_PLATFORM: Record<string, Platform['name']> = {
+        'windows':          'Windows',
+        'windows phone':    'Windows',
+        'macos':            'macOS',
+        'ios':              'iOS',
+        'android':          'Android',
+        'linux':            'Linux',
+    };
+
+    let userPlatformFull = $derived.by(() => {
+
+        const mapped = OS_TO_PLATFORM[userPlatformDetected] ?? 'Other';
+
+        return platforms.find(p => p.name === mapped)
+            ?? platforms.find(p => p.name === 'Other');
+
+    });
+
+    
+    let copiedExample = $state(false);
+
+
+    let searchPanelText = $state("");
+    let searchPanelOpen = $state(true);
+    function searchPanelToggle() {
+
+        searchPanelOpen = !searchPanelOpen;
+        console.log("Search panel toggled to new state: ", searchPanelOpen);
+
+    }
+
+    let owner = $state('');
+    let repo = $state('');
+
+    let repoMeta = $state(undefined);
+    let readme = $state<string | null>(null);
+    let topics = $state<string[]>([]);
 
 
 
@@ -156,7 +172,7 @@
         const selectedPlatformName = select.value;
 
         //Find the platform by name
-        userPlatformFull = platforms.find((p: Platform) => p.name === selectedPlatformName) ?? null;
+        userPlatformFull = platforms.find((p: Platform) => p.name === selectedPlatformName) ?? undefined;
 
         console.log("User platform set to:", userPlatformFull);
 
@@ -719,7 +735,7 @@
                             md:block!
                             header-flat"
                         >
-                            {userPlatformFull?.name === userPlatformDetected?.name ? 'Detected Platform' : 'Target Platform'}
+                            {userPlatformFull?.name === userPlatformDetected ? 'Detected Platform' : 'Target Platform'}
                         </div>
 
                         <div class="group relative inline-block header-button-row-size hover:bg-blue-100/50 rounded-sm p-2 px-3 mx-[-0.5rem] hover:cursor-pointer">

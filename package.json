@@ -1,7 +1,7 @@
 {
     "name": "bloobarrel",
     "private": true,
-    "version": "1.1.1",
+    "version": "1.1.2",
     "type": "module",
     "scripts": {
         "dev": "vite dev",
@@ -31,6 +31,7 @@
         "@fortawesome/fontawesome-free": "^6.7.2",
         "@popperjs/core": "^2.11.8",
         "@tailwindcss/vite": "^4.1.7",
+        "bowser": "^2.11.0",
         "octokit": "^4.1.3",
         "rehype-slug": "^6.0.0",
         "remark-toc": "^9.0.0",
