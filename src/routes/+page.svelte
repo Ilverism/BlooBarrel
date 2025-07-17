@@ -43,8 +43,13 @@
             /Win/.test(os) ? 'win'
         :   /Mac/.test(os) ? 'mac'
         :   /Linux/.test(os) ? 'linux'
+        :   /Android/.test(os) ? 'android'
+        :   /iOS/.test(os) ? 'ios'
+        :   /Web/.test(os) ? 'web'
         : null;
 
+
+    let copiedExample = $state(false);
 
     let searchPanelText = $state("");
     let searchPanelOpen = $state(true);
@@ -1129,11 +1134,14 @@
                     <button class="
                         w-full
                         group hover:cursor-pointer mt-16 text-2xl italic message-text hover:scale-105 transition-all duration-200 ease-in-out font-light whitespace-pre flex flex-col items-center justify-center gap-4
+                        {copiedExample?'opacity-50':'opacity-100'}
                         "
                         onclick={() => {
-                        navigator.clipboard.writeText('https://github.com/electron/electron/');
-                        console.log("Copied example URL to clipboard!");
-                    }}>
+                            navigator.clipboard.writeText('https://github.com/electron/electron/');
+                            console.log("Copied example URL to clipboard!");
+                            copiedExample = true;
+                        }}
+                    >
                         <div class="
                             md:hidden!
                             w-full text-center text-2xl whitespace-normal!
@@ -1150,7 +1158,7 @@
                             md:scale-100
                             button-flat
                         ">
-                            <i class="fa-fw fa-solid fa-link"></i>
+                            <i class="fa-fw fa-solid {copiedExample?'fa-check':'fa-link'}"></i>
                             <div class="group-hover:underline">
                                 https://github.com/electron/electron/
                             </div>
