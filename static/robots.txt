@@ -1,0 +1,12 @@
+# allow crawling everything by default
+User-agent: *
+Disallow:
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+
+Sitemap: https://bloobarrel.pages.dev/sitemap.xml

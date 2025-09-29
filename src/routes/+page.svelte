@@ -137,6 +137,7 @@
 
     
     let copiedExample = $state(false);
+    let copiedShareable = $state(false);
 
 
     let searchPanelText = $state("");
@@ -530,6 +531,9 @@
         //Set the performed first fetch flag
         performedFirstFetch = true;
 
+        //Clear the copied shareable flag
+        copiedShareable = false;
+
         console.log("...Done fetching releases!");
 
     }
@@ -556,6 +560,7 @@
         navigator.clipboard.writeText(shareableURL.href)
             .then(() => {
                 console.log("Shareable URL copied to clipboard!");
+                copiedShareable = true;
             })
             .catch((err) => {
                 console.error("Failed to copy shareable URL to clipboard:", err);
@@ -680,7 +685,7 @@
         out:blur={{ duration: 800, amount: 8, delay: 200 }}
     >
         <div class="text-lg text-gray-700 dark:text-gray-300 italic">Loading...</div>
-        <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8 animate-pulse">
+        <img src="favicon-96x96.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8 animate-pulse">
     </div>
 {:else}
 
@@ -707,10 +712,10 @@
                     target="_blank"
                     href="https://github.com/Ilverism/BlooBarrel"
                 >
-                    <img src="BlooBarrel_LOGO_Small.png" alt="Bloobarrel Logo" class="w-8 h-8">
+                    <img src="favicon-96x96.png" alt="Bloobarrel Logo" class="w-8 h-8">
                     <div class="flex flex-col relative">
                         <span class="text-blue-400 self-center">BlooBarrel</span>
-                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. 2025-07.16</span>
+                        <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap group-hover:hidden">ver. 2025-09.28 (Beta)</span>
                         <span class="text-blue-400 text-sm font-light absolute top-7 whitespace-nowrap not-group-hover:hidden pt-1">
                             <i class="fa-solid fa-fw fa-arrow-up-right-from-square text-blue-400/50"></i>
                             Open in GitHub
@@ -991,7 +996,10 @@
                     </div>
 
                     <!-- Other -->
-                    <div class="justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-125 max-w-[75%]">
+                    <div class="
+                        justify-self-end flex flex-col items-start justify-center gap-4 mx-auto scale-125 max-w-[75%]
+                        {copiedShareable?'opacity-50':'opacity-100'}
+                    ">
 
                         <!-- Copy Shareable URL -->
                         <button
@@ -999,7 +1007,7 @@
                             onclick={buildShareableURL}
                             aria-label="Copy URL"
                         >
-                            <i class="fa-fw fa-solid fa-link"></i>
+                            <i class="fa-fw fa-solid {copiedShareable?'fa-check':'fa-link'}"></i>
                             <div class="group-hover:underline">
                                 Copy Shareable Link
                             </div>
@@ -1144,7 +1152,7 @@
 
                     </div>
 
-                    <img src="BlooBarrel_LOGO_Small.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
+                    <img src="favicon-96x96.png" alt="BlooBarrel Logo" class="w-12 h-12 mt-8">
 
                     <!-- Copyable Example -->
                     <button class="

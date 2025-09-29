@@ -1,7 +1,7 @@
 {
-    "name": "bloobarrel",
+    "name": "BlooBarrel",
     "private": true,
-    "version": "1.1.2",
+    "version": "1.2.0",
     "type": "module",
     "scripts": {
         "dev": "vite dev",
@@ -13,6 +13,7 @@
         "deploy": "cross-env NODE_ENV=production npm run build && node -e \"require('fs').writeFileSync('build/.nojekyll','')\" && gh-pages -d build"
     },
     "devDependencies": {
+        "@sveltejs/adapter-cloudflare": "^7.2.3",
         "@sveltejs/adapter-static": "^3.0.8",
         "@sveltejs/kit": "^2.16.0",
         "@sveltejs/vite-plugin-svelte": "^5.0.0",
@@ -21,6 +22,7 @@
         "flowbite-svelte": "^1.5.0",
         "gh-pages": "^6.3.0",
         "mdsvex": "^0.12.6",
+        "sk-seo": "^0.5.4",
         "svelte": "^5.0.0",
         "svelte-check": "^4.0.0",
         "svelte-showdown": "^0.4.2",
@@ -35,6 +37,7 @@
         "octokit": "^4.1.3",
         "rehype-slug": "^6.0.0",
         "remark-toc": "^9.0.0",
+        "showdown": "^2.1.0",
         "tailwind-merge": "^3.3.0",
         "tailwind-scrollbar": "^4.0.2",
         "tailwindcss": "^4.1.7"

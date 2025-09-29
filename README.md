@@ -1,5 +1,5 @@
 
-[<img src="https://github.com/user-attachments/assets/419e9ca6-301e-4acd-b17b-6d158d98f44e">](https://ilverism.github.io/BlooBarrel/)
+[<img src="https://github.com/user-attachments/assets/419e9ca6-301e-4acd-b17b-6d158d98f44e">](https://bloobarrel.pages.dev/BlooBarrel/)
 
 ## About BlooBarrel
 BlooBarrel provides a simpler way for people with a lower technical ability to download assets from GitHub, and for more technical users to share GitHub content with less technical people.
@@ -24,8 +24,8 @@ Simply provide the link to a repo, and BlooBarrel will recommend the best asset(
 ### Other Functionality
 - Your *Detected Platform* (used to help recommend Assets) can be changed/overridden using a dropdown menu at the top right.
 - You can change how Assets are sorted in the *All Downloads* list by clicking the *Sort By: **Alphabetical*** button.
-- After loading a repo, use the *Copy Shareable Link* button to copy a link directly to BlooBarrel, which will load the given repo automatically when opened (e.g., https://ilverism.github.io/BlooBarrel/?owner=electron&repo=electron).
-- You can also quickly load a repo's content by appending an entire URL to the BlooBarrel page URL when combined with a hash mark (e.g., https://ilverism.github.io/BlooBarrel/#https://github.com/electron/electron).
+- After loading a repo, use the *Copy Shareable Link* button to copy a link directly to BlooBarrel, which will load the given repo automatically when opened (e.g., https://bloobarrel.pages.dev/BlooBarrel/?owner=electron&repo=electron).
+- You can also quickly load a repo's content by appending an entire URL to the BlooBarrel page URL when combined with a hash mark (e.g., https://bloobarrel.pages.dev/BlooBarrel/#https://github.com/electron/electron).
 ---
 ### Information Panels
 - *Information Panels* can be opened after loading a repo by using a toggle switch that appears at the top right.
